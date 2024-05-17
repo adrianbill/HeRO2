@@ -55,13 +55,13 @@ $C_v = C_p - R$
 Since the adiabatic index for a gas is the ratio of the specific heats as indicated above, it depends upon the effective number of degrees of freedom $(f)$ in the molecular motion.
 
 #### Monoatomic gasses
-For a monoatomic gas like helium, $f=3\ $ and $\ {\large \gamma} = 5/3 \approx 1.66$. 
+For a monoatomic gas like helium, $f=3\$ and $\ {\large \gamma} = 5/3 \approx 1.66$. 
 
 #### Diatomic molecules
-For diatomic molecules like $N_2\ $ and $O_2$, you include two degrees of rotational freedom, so $f=5\ $ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, $\ {\large \gamma} approx 1.4\ $ can be used for dry air in such calculations as the speed of sound. 
+For diatomic molecules like $N_2\ $ and $O_2$, you include two degrees of rotational freedom, so $f=5\$ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, $\ {\large \gamma} \approx 1.4\$ can be used for dry air in such calculations as the speed of sound. 
 
 #### Polyatomic molecules
-For polyatomic molecules, there is evidence of contribution of vibrational degrees of freedom that would reduce the heat capacity ratio from the expected $\ {\large \gamma} = 4/3$. This includes molecules such as $\ CO_2\ $ and $\ H_2O$, and therefore relative humidity can effect the calculation of the speed of sound. For this reason calibration of the device will be done using dry gasses.
+For polyatomic molecules, there is evidence of contribution of vibrational degrees of freedom that would reduce the heat capacity ratio from the expected $\ {\large \gamma} = 4/3$. This includes molecules such as $\ CO_2\$ and $\ H_2O$, and therefore relative humidity can effect the calculation of the speed of sound. For this reason calibration of the device will be done using dry gasses.
 
 #### Important Values
 The heat capacities, adiabatic indices, and molar masses for relevant gasses.
@@ -97,11 +97,11 @@ where:
 
 The effective adiabatic index of the gas mixture can then be calculated using the same formula as that of a single gas.
 
-${\Large \gamma}_{mix} = \frac{C_{p,mix}}{C_{v,mix}}$
+$\gamma_{mix} = \frac{C_{p,mix}}{C_{v,mix}}$
 
 This can be reconfigured to use the $\gamma$ values of the individual components:
 
-${\Large \gamma}_{mix} = \frac{\normalsize \sum_{i}x_i \frac{\gamma_i}{\gamma_i - 1}}{\normalsize \sum_{i}x_i \frac{1}{\gamma_i - 1}} = \frac{\normalsize1}{\normalsize \sum_{i}x_i \frac{1}{\gamma_i - 1}} + 1$
+$\gamma_{mix} = \frac{\normalsize \sum_{i}x_i \frac{\gamma_i}{\gamma_i - 1}}{\normalsize \sum_{i}x_i \frac{1}{\gamma_i - 1}} = \frac{\normalsize1}{\normalsize \sum_{i}x_i \frac{1}{\gamma_i - 1}} + 1$
 
 #### Molar Mass
 
@@ -131,7 +131,7 @@ $M_{mix} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
 
 Let $G_i =  ({\large \gamma}_i-1)^{-1}$
 
-${\Large \gamma}_{mix} = \frac{\normalsize1}{\normalsize x_{He} G_{He} + x_{O_2} G_{O_2} + (1 - x_{He} - x_{O_2}) G_{N_2}} + 1$
+$\gamma_{mix} = \frac{\normalsize1}{\normalsize x_{He} G_{He} + x_{O_2} G_{O_2} + (1 - x_{He} - x_{O_2}) G_{N_2}} + 1$
 
 #### 4. Use the speed of sound formula
 
@@ -143,7 +143,7 @@ $M = {\Large \frac{{\large \gamma} R T}{c^2}}$
 
 By equating the expression for $M$ from the speed of sound with the expression for the average molar mass of the mixture, we get:
 
-${\Large \frac{{\large\gamma}_{\text{mix}} R T}{v^2}} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
+${\Large \frac{\gamma_{mix} R T}{v^2}} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
 
 This equation contains the unknown $x_{He}$. Since $\gamma_{\text{mix}}$ also depends on $x_{He}$, this is a non-linear equation. It can be solved iteratively or using numerical methods to find the value of $x_{He}$.
 
