@@ -10,14 +10,12 @@
 
 // Custom Headers
 #include "oxygen.h"
+#include "temp_hum.h"
 
 
 
 // function declarations
-double temperature_measurement();
-double humidity_measurement();
 double measure_duration();
-double measure_water(double, double);
 double calculate_molar_mass(double, double, double, double);
 double calculate_effective_gamma(double, double, double, double);
 double calculate_speed_of_sound(double, double, double);
@@ -27,7 +25,7 @@ double speed_measurement(double);
 double measure_helium(double, double, double, double);
 void displayValues(double, double, double, double);
 void serialdisplayValues(double, double, double, double, double, double);
-void Temp_Initialise();
+
 void Display_Initialise();
 
 
@@ -41,8 +39,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 
-// Temp/Hum sensor info
-Adafruit_HTU21DF htu = Adafruit_HTU21DF();
 
 // Ultrasonic Sensor Setup
 const int trigPin = 27; // Single Trigger pin for both ultrasonic sensors
@@ -74,10 +70,6 @@ double O2_calibration; // Calibration value (%/mV)
 double dist_cal = 0.04805;
 
 // Running Average Setup
-RunningAverage RA_temp(10);
-RunningAverage RA_hum(10);
-
-
 RunningAverage RA_He(10);
 RunningAverage RA_dur(10);
 
@@ -103,8 +95,7 @@ void setup()
     // O2 Initialise
     O2_Initialise();
 
-    RA_temp.clear();
-    RA_hum.clear();
+
     RA_He.clear();
     RA_dur.clear();
 
@@ -137,7 +128,7 @@ void loop()
     double c_mea = speed_measurement(dist_cal); // Speed of sound in m/s
     double hum = humidity_measurement();
 
-    double x_H2O = measure_water(T, hum);
+    double x_H2O = measure_water(T, hum, pres_atm);
 
     // calibrate_distance (2, T, x_H2O);
 
@@ -149,31 +140,10 @@ void loop()
     serialdisplayValues(c_mea, x_O2, x_He, x_H2O, hum, T);
 
     // measure_oxygen();
-
     delay(500);
+    
 }
 
-
-
-// Temperature Measurement Function in Kelvin
-double temperature_measurement()
-{
-
-    double temp = htu.readTemperature() + 273.15;
-    RA_temp.addValue(temp);
-
-    return RA_temp.getAverage();
-}
-
-// Relative Humidity Measurement Function
-double humidity_measurement()
-{
-
-    double hum = htu.readHumidity() / 100;
-    RA_hum.addValue(hum);
-
-    return RA_hum.getAverage();
-}
 
 // Function to measure the sound travel time in seconds one way
 double measure_duration()
@@ -194,15 +164,7 @@ double measure_duration()
     return RA_dur.getAverage() / 2000000;
 }
 
-// Function to calculate the fraction of water in gas using relative humidity
-double measure_water(double T, double hum)
-{
-    double T_C = T - 273.15; // convert K to C
 
-    // calculate saturation vapor pressure of water kPa
-    double pres_sat = 0.61078 * exp((17.27 * T_C) / (T_C + 237.3)); // Tetens equation
-    return (pres_sat * hum) / pres_atm;                             // calculate x_H20
-}
 // Function to calculate the molar mass of the mixture
 double calculate_molar_mass(double x_He, double x_O2, double x_N2, double x_H2O)
 {
@@ -387,15 +349,7 @@ void serialdisplayValues(double c_mea, double x_O2, double x_He, double x_H2O, d
     Serial.println("°C");
 }
 
-void Temp_Initialise()
-{
-    if (!htu.begin())
-    {
-        Serial.println("Check circuit. HTU21D not found!");
-        while (1)
-            ;
-    }
-}
+
 
 void Display_Initialise()
 {
