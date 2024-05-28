@@ -131,7 +131,7 @@ $M_{mix} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
 
 Let $G_i =  ({\large \gamma}_i-1)^{-1}$
 
-$\gamma_{mix} = \frac{\normalsize1}{\normalsize x_{He} G_{He} + x_{O_2} G_{O_2} + (1 - x_{He} - x_{O_2}) G_{N_2}} + 1$
+$\gamma_{mix} = (x_{He} G_{He} + x_{O_2} G_{O_2} + (1 - x_{He} - x_{O_2}) G_{N_2})^{-1} + 1$
 
 #### 4. Use the speed of sound formula
 
@@ -146,4 +146,3 @@ By equating the expression for $M$ from the speed of sound with the expression f
 ${\Large \frac{\gamma_{mix} R T}{v^2}} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
 
 This equation contains the unknown $x_{He}$. Since $\gamma_{\text{mix}}$ also depends on $x_{He}$, this is a non-linear equation. It can be solved iteratively or using numerical methods to find the value of $x_{He}$.
-
