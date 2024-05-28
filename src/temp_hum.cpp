@@ -1,14 +1,12 @@
-//Libraries
+// Libraries
 #include <Arduino.h>          // Basic Library
 #include <Wire.h>             // I2C Library
 #include <Adafruit_GFX.h>     // Graphic Library
 #include <RunningAverage.h>   // Running Average Library
 #include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
 
-
 // Paired Header
 #include "temp_hum.h"
-
 
 // Temp/Hum sensor info
 Adafruit_HTU21DF htu = Adafruit_HTU21DF();
@@ -29,7 +27,6 @@ void Temp_Initialise()
 
     RA_temp.clear();
     RA_hum.clear();
-
 }
 
 // Temperature Measurement Function in Kelvin

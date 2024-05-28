@@ -1,4 +1,4 @@
-//Libraries
+// Libraries
 #include <Arduino.h>          // Basic Library
 #include <Wire.h>             // I2C Library
 #include <Adafruit_GFX.h>     // Graphic Library
@@ -8,15 +8,13 @@
 // Paired Header
 #include "oxygen.h"
 
-
 // Define ADC address (Amplifier)
 Adafruit_ADS1115 O2ADC;
 const float multiplier = 0.0625F; // ADC value/bit for gain of 2
 // const double multiplier = 0.0078125; // ADC value/bit for gain of 16
 
-//O2 running average setup
+// O2 running average setup
 RunningAverage RA_O2(10);
-
 
 // Initialiases Analog to Digital Converter for O2 Sensor and clear running average
 void O2_Initialise()
@@ -32,7 +30,6 @@ void O2_Initialise()
 
     RA_O2.clear();
 }
-
 
 // Function to calibration Oxygen
 double calibrate_oxygen()
@@ -60,9 +57,7 @@ double calibrate_oxygen()
     Serial.print("  cal: ");
     Serial.println(0.209 / mv_mea, 8);
 
-
     return (0.209 / mv_mea);
-
 }
 
 // Function to measure Oxygen
@@ -71,7 +66,6 @@ double measure_oxygen(double O2_cal)
 
     double millivolts = O2ADC.readADC_SingleEnded(0);
     RA_O2.addValue(millivolts);
-
 
     double mv_mea = RA_O2.getAverage();
 

@@ -12,8 +12,6 @@
 #include "oxygen.h"
 #include "temp_hum.h"
 
-
-
 // function declarations
 double measure_duration();
 double calculate_molar_mass(double, double, double, double);
@@ -28,7 +26,6 @@ void serialdisplayValues(double, double, double, double, double, double);
 
 void Display_Initialise();
 
-
 // Display
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -36,9 +33,6 @@ void Display_Initialise();
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-
-
 
 // Ultrasonic Sensor Setup
 const int trigPin = 27; // Single Trigger pin for both ultrasonic sensors
@@ -95,7 +89,6 @@ void setup()
     // O2 Initialise
     O2_Initialise();
 
-
     RA_He.clear();
     RA_dur.clear();
 
@@ -118,8 +111,6 @@ void setup()
 
 void loop()
 {
-
-   
     // To be measured
     // double x_O2 = 0.209; // Oxygen fraction
     // double T = 293.0; // Temperature in Kelvin
@@ -141,14 +132,11 @@ void loop()
 
     // measure_oxygen();
     delay(500);
-    
 }
-
 
 // Function to measure the sound travel time in seconds one way
 double measure_duration()
 {
-
     // Clear the trigger pin
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -163,7 +151,6 @@ double measure_duration()
 
     return RA_dur.getAverage() / 2000000;
 }
-
 
 // Function to calculate the molar mass of the mixture
 double calculate_molar_mass(double x_He, double x_O2, double x_N2, double x_H2O)
@@ -348,8 +335,6 @@ void serialdisplayValues(double c_mea, double x_O2, double x_He, double x_H2O, d
     Serial.print(T - 273.15, 2); // Display temperature in Celsius
     Serial.println("°C");
 }
-
-
 
 void Display_Initialise()
 {
