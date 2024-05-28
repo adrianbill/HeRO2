@@ -8,6 +8,7 @@
 // Paired Header
 #include "oxygen.h"
 
+
 // Define ADC address (Amplifier)
 Adafruit_ADS1115 O2ADC;
 const float multiplier = 0.0625F; // ADC value/bit for gain of 2
@@ -68,12 +69,9 @@ double calibrate_oxygen()
 double measure_oxygen(double O2_cal)
 {
 
-    for (int i = 0; i <= 10; i++)
-    {
-        double millivolts = O2ADC.readADC_SingleEnded(0);
-        RA_O2.addValue(millivolts);
-        delay(15);
-    }
+    double millivolts = O2ADC.readADC_SingleEnded(0);
+    RA_O2.addValue(millivolts);
+
 
     double mv_mea = RA_O2.getAverage();
 
@@ -93,8 +91,6 @@ double measure_oxygen(double O2_cal)
     // Serial.print(" || Max: ");
     // Serial.print(RA_O2.getMaxInBuffer() * multiplier, 2);
     // Serial.println("mV");
-
-    
 
     return mv_mea * O2_cal; // Convert mV ADC reading to % O2
 }
