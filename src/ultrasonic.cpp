@@ -10,8 +10,6 @@
 // Paired Header
 #include "ultrasonic.h"
 
-
-
 // Ultrasonic Sensor Setup
 const int trigPin = 27; // Single Trigger pin for both ultrasonic sensors
 const int echoPin = 26; // Echo pin for each utrasonic sensors
@@ -26,7 +24,7 @@ void ultrasonic_Initialise()
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
 
-    RA_dur.clear(); 
+    RA_dur.clear();
 }
 
 // Function to measure the sound travel time in seconds one way
