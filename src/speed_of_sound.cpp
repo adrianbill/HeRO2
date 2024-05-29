@@ -1,7 +1,7 @@
 // Libraries
-#include <Arduino.h>          // Basic Library
-#include <math.h>             // Math Library
-#include <RunningAverage.h>   // Running Average Library
+#include <Arduino.h>        // Basic Library
+#include <math.h>           // Math Library
+#include <RunningAverage.h> // Running Average Library
 
 // Paired Header
 #include "speed_of_sound.h"
