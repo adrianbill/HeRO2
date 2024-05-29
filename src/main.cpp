@@ -9,17 +9,14 @@
 #include <RunningAverage.h>   // Running Average Library
 
 // Custom Headers
-#include "oxygen.h"
-#include "temp_hum.h"
+#include "constants.h"
+#include "oxygen.h"         //oxygen calculations
+#include "temp_hum.h"       //temperature, humidity, water% calcs
+#include "ultrasonic.h"     //ultrasonic measurement
+#include "speed_of_sound.h" //speed of sound calculations
 
 // function declarations
-double measure_duration();
-double calculate_molar_mass(double, double, double, double);
-double calculate_effective_gamma(double, double, double, double);
-double calculate_speed_of_sound(double, double, double);
 
-double calibrate_distance(int, double, double);
-double speed_measurement(double);
 double measure_helium(double, double, double, double);
 void displayValues(double, double, double, double);
 void serialdisplayValues(double, double, double, double, double, double);
@@ -34,29 +31,6 @@ void Display_Initialise();
 #define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// Ultrasonic Sensor Setup
-const int trigPin = 27; // Single Trigger pin for both ultrasonic sensors
-const int echoPin = 26; // Echo pin for each utrasonic sensors
-
-// Constants
-// Universal Gas constant, J/(mol.K)
-const double R = 8.314462618;
-
-// Atmospheric Pressure (kPa)
-const double pres_atm = 101.325;
-
-// Adiabatic Indices
-const double gamma_He = 1.666;
-const double gamma_O2 = 1.394;
-const double gamma_N2 = 1.399;
-const double gamma_H2O = 1.33;
-
-// Molar Masses, kg/mol
-const double M_He = 0.00400;
-const double M_O2 = 0.03200;
-const double M_N2 = 0.02802;
-const double M_H2O = 0.01802;
-
 // Oxygen Analysis setup
 double O2_calibration; // Calibration value (%/mV)
 
@@ -65,17 +39,12 @@ double dist_cal = 0.04805;
 
 // Running Average Setup
 RunningAverage RA_He(10);
-RunningAverage RA_dur(10);
 
 void setup()
 {
     // start serial connection
     Serial.begin(115200);
     delay(1000); // Delay to stabilize serial communication
-
-    // establish pins
-    pinMode(trigPin, OUTPUT);
-    pinMode(echoPin, INPUT);
 
     // Initialise I2C
     Wire.begin();
@@ -89,8 +58,10 @@ void setup()
     // O2 Initialise
     O2_Initialise();
 
+    // Ultrasonic initialise
+    ultrasonic_Initialise();
+
     RA_He.clear();
-    RA_dur.clear();
 
     O2_calibration = calibrate_oxygen();
 
@@ -118,8 +89,7 @@ void loop()
     double T = temperature_measurement();       // Measure the temperature
     double c_mea = speed_measurement(dist_cal); // Speed of sound in m/s
     double hum = humidity_measurement();
-
-    double x_H2O = measure_water(T, hum, pres_atm);
+    double x_H2O = measure_water(T, hum, constants::pres_atm);
 
     // calibrate_distance (2, T, x_H2O);
 
@@ -132,104 +102,6 @@ void loop()
 
     // measure_oxygen();
     delay(500);
-}
-
-// Function to measure the sound travel time in seconds one way
-double measure_duration()
-{
-    // Clear the trigger pin
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-
-    // Send a 10 microsecond pulse to trigger the sensor
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-
-    double duration = pulseIn(echoPin, HIGH);
-    RA_dur.addValue(duration);
-
-    return RA_dur.getAverage() / 2000000;
-}
-
-// Function to calculate the molar mass of the mixture
-double calculate_molar_mass(double x_He, double x_O2, double x_N2, double x_H2O)
-{
-    return x_He * M_He + x_O2 * M_O2 + x_N2 * M_N2 + x_H2O * M_H2O;
-}
-
-// Function to calculate the effective adiabatic index (G_i=(gamma_i−1)^-1
-double calculate_effective_gamma(double x_He, double x_O2, double x_N2, double x_H2O)
-{
-    double G_He = 1 / (gamma_He - 1);
-    double G_O2 = 1 / (gamma_O2 - 1);
-    double G_N2 = 1 / (gamma_N2 - 1);
-    double G_H2O = 1 / (gamma_H2O - 1);
-    double G_mix = x_He * G_He + x_O2 * G_O2 + x_N2 * G_N2 + x_H2O * G_H2O;
-    return (1 / G_mix) + 1;
-}
-
-// Function to calculate the speed of sound
-double calculate_speed_of_sound(double gamma_mix, double M_mix, double T)
-{
-    return sqrt(gamma_mix * R * T / M_mix);
-}
-
-// Function to calibrate distance
-double calibrate_distance(int gas, double T, double x_H2O)
-{
-    double c_calibrate, M_mix, gamma_mix;
-
-    switch (gas)
-    {
-    case 1:
-        // dry air
-        M_mix = calculate_molar_mass(0, 0.209, (1 - 0.209), 0);
-        gamma_mix = calculate_effective_gamma(0, 0.209, (1 - 0.209), 0);
-        c_calibrate = calculate_speed_of_sound(gamma_mix, M_mix, T);
-        break;
-    case 2:
-        // ambient air
-        M_mix = calculate_molar_mass(0, 0.209, (1 - 0.209), x_H2O);
-        gamma_mix = calculate_effective_gamma(0, 0.209, (1 - 0.209), x_H2O);
-        c_calibrate = calculate_speed_of_sound(gamma_mix, M_mix, T);
-        // c_calibrate = 348.5;
-        break;
-    case 3:
-        // Oxygen
-        M_mix = calculate_molar_mass(0, 1, 0, 0);
-        gamma_mix = calculate_effective_gamma(0, 0.209, (1 - 0.209), 0);
-        c_calibrate = calculate_speed_of_sound(gamma_mix, M_mix, T);
-        break;
-    case 4:
-        // Helium
-        M_mix = calculate_molar_mass(1, 0, 0, 0);
-        gamma_mix = calculate_effective_gamma(0, 0.209, (1 - 0.209), 0);
-        c_calibrate = calculate_speed_of_sound(gamma_mix, M_mix, T);
-        break;
-    }
-
-    double duration = measure_duration();
-
-    double distance = c_calibrate * duration;
-
-    Serial.print("Speed Cal: ");
-    Serial.print(c_calibrate);
-
-    Serial.print(" | Dur: ");
-    Serial.print(duration * 2000000);
-    Serial.print(" µs | Dist: ");
-    Serial.print(distance * 1000);
-    Serial.println(" mm");
-
-    return distance;
-}
-
-// speed of sound measurement
-double speed_measurement(double distance)
-{
-    double duration = measure_duration();
-    return distance / duration; // Calculate the speeds in m/s
 }
 
 // function to trigger helium reading

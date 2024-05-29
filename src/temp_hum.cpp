@@ -1,7 +1,6 @@
 // Libraries
 #include <Arduino.h>          // Basic Library
 #include <Wire.h>             // I2C Library
-#include <Adafruit_GFX.h>     // Graphic Library
 #include <RunningAverage.h>   // Running Average Library
 #include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
 
