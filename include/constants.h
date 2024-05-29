@@ -2,8 +2,7 @@
 #define CONSTANTS_H
 
 // define your own namespace to hold constants
-namespace constants
-{
+
     // Universal Gas constant, J/(mol.K)
     extern const double R;
 
@@ -21,6 +20,6 @@ namespace constants
     extern const double M_O2;
     extern const double M_N2;
     extern const double M_H2O;
-}
+
 
 #endif

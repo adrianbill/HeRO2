@@ -1,9 +1,7 @@
 #include "constants.h"
 
 // define your own namespace to hold constants
-namespace constants
-{
-    // Universal Gas constant, J/(mol.K)
+      // Universal Gas constant, J/(mol.K)
     extern constexpr double R{8.314462618};
 
     // Atmospheric Pressure (kPa)
@@ -20,4 +18,3 @@ namespace constants
     extern constexpr double M_O2{0.03200};
     extern constexpr double M_N2{0.02802};
     extern constexpr double M_H2O{0.01802};
-}

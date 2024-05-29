@@ -89,7 +89,7 @@ void loop()
     double T = temperature_measurement();       // Measure the temperature
     double c_mea = speed_measurement(dist_cal); // Speed of sound in m/s
     double hum = humidity_measurement();
-    double x_H2O = measure_water(T, hum, constants::pres_atm);
+    double x_H2O = measure_water(T, hum, pres_atm);
 
     // calibrate_distance (2, T, x_H2O);
 
