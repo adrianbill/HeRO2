@@ -14,7 +14,7 @@ Gas analyser with other extravagant features to complicated and simply divering
 
 ### Assumptions
  - Gas composition for speed of sound calculations includes only:
-    - Helium (`$He$`)
+    - Helium ($He$)
     - Oxygen ($O_2$)
     - Nitrogen ($N_2$)
  - relative humidity will be measured but it assumed that all gasses are dry.
