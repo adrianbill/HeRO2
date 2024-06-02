@@ -1,4 +1,5 @@
 # HeRO<sub>2</sub>
+
 Gas analyser with other extravagant features to complicated and simply divering
 
 ## Introduction
@@ -9,16 +10,18 @@ Gas analyser with other extravagant features to complicated and simply divering
  2. Detect Carbon monoxide levels as a safety precaution
 
 ### Basic Methods
- - Oxygen fraction will be measured using an electro-galvanic sensor.
- - Helium fraction will be measured using an ultrasonic sensor via speed of sound calculations.
+
+- Oxygen fraction will be measured using an electro-galvanic sensor.
+- Helium fraction will be measured using an ultrasonic sensor via speed of sound calculations.
 
 ### Assumptions
- - Gas composition for speed of sound calculations includes only:
-    - Helium ($He$)
-    - Oxygen ($O_2$)
-    - Nitrogen ($N_2$)
- - relative humidity will be measured but it assumed that all gasses are dry.
- - Carbon Monoxide ($CO$) levels will only be used as a safety measure. 
+
+- Gas composition for speed of sound calculations includes only:
+  - Helium ($He$)
+  - Oxygen ($O_2$)
+  - Nitrogen ($N_2$)
+- relative humidity will be measured but it assumed that all gasses are dry.
+- Carbon Monoxide ($CO$) levels will only be used as a safety measure.
 
 ## Helium Calculation
 
@@ -29,6 +32,7 @@ The speed of sound $c$ in a gas is:
 $c = \sqrt{\Large \frac{{\large \gamma} R T}{M}}$
 
 where:
+
 - $\large \gamma$ is the adiabatic index (heat capacity ratio),
 - $R$ is the universal gas constant $(8.314\ ^J/_{K\cdot mol})$,
 - $T$ is the absolute temperature $(K)$,
@@ -45,6 +49,7 @@ For this application ideal gas law applies and the following can be used,
 $\Large \gamma = \frac{C_p}{C_v}$
 
 where:
+
 - $C_p$ is specific heat capacity at constant pressure $(^J/_{K\cdot mol})$
 - $C_v$ is specific heat capacity at constant volume $(^J/_{K\cdot mol})$
 
@@ -55,15 +60,19 @@ $C_v = C_p - R$
 Since the adiabatic index for a gas is the ratio of the specific heats as indicated above, it depends upon the effective number of degrees of freedom $(f)$ in the molecular motion.
 
 #### Monoatomic gasses
-For a monoatomic gas like helium, $f=3\$ and $\ {\large \gamma} = 5/3 \approx 1.66$. 
+
+For a monoatomic gas like helium, $f=3\$ and $\ {\large \gamma} = 5/3 \approx 1.66$.
 
 #### Diatomic molecules
-For diatomic molecules like $N_2\ $ and $O_2$, you include two degrees of rotational freedom, so $f=5\$ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, $\ {\large \gamma} \approx 1.4\$ can be used for dry air in such calculations as the speed of sound. 
+
+For diatomic molecules like $N_2\ $ and $O_2$, you include two degrees of rotational freedom, so $f=5\$ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, $\ {\large \gamma} \approx 1.4\$ can be used for dry air in such calculations as the speed of sound.
 
 #### Polyatomic molecules
+
 For polyatomic molecules, there is evidence of contribution of vibrational degrees of freedom that would reduce the heat capacity ratio from the expected $\ {\large \gamma} = 4/3$. This includes molecules such as $\ CO_2\$ and $\ H_2O$, and therefore relative humidity can effect the calculation of the speed of sound. For this reason calibration of the device will be done using dry gasses.
 
 #### Important Values
+
 The heat capacities, adiabatic indices, and molar masses for relevant gasses.
 
 | $Gas$  | $C_p$                | $C_v$                | $\Large \gamma$ | $M$ |
@@ -78,12 +87,11 @@ The heat capacities, adiabatic indices, and molar masses for relevant gasses.
 
 [Ref: NIST Chemistry WebBook](https://webbook.nist.gov/chemistry/):
 
-
 ### Gas Mixtures [Ref](https://physics.stackexchange.com/questions/173976/speed-of-sound-of-a-gas-mixture)
 
 The speed of sound for a mized gas uses the same formula as define above. The adiabatic index and molar masses for the mixture are defined as follows:
 
-#### Adiabatic index 
+#### Adiabatic index
 
 The heat capacities of the gas mixture can be calculated using the weighted sum of the individual components. For a gas mixture with $i$ gasses:
 
