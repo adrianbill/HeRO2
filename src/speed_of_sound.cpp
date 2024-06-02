@@ -3,10 +3,11 @@
 #include <math.h>           // Math Library
 #include <RunningAverage.h> // Running Average Library
 
+// Custom Headers
+#include "constants.h"
+
 // Paired Header
 #include "speed_of_sound.h"
-
-#include "constants.h"
 
 // Function to calculate the molar mass of the mixture
 double calculate_molar_mass(double x_He, double x_O2, double x_N2, double x_H2O)
