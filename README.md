@@ -61,11 +61,11 @@ Since the adiabatic index for a gas is the ratio of the specific heats as indica
 
 #### Monoatomic gasses
 
-For a monoatomic gas like helium, $f=3\$ and $\ {\large \gamma} = 5/3 \approx 1.66$.
+For a monoatomic gas like helium, $f=3$ and ${\large \gamma} = 5/3 \approx 1.66$.
 
 #### Diatomic molecules
 
-For diatomic molecules like $N_2\ $ and $O_2$, you include two degrees of rotational freedom, so $f=5\$ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, $\ {\large \gamma} \approx 1.4\$ can be used for dry air in such calculations as the speed of sound.
+For diatomic molecules like $N_2$ and $O_2$, you include two degrees of rotational freedom, so $f=5$ and $\ {\large \gamma} = 7/5 = 1.4$. Since almost all of the atmosphere is nitrogen and oxygen, ${\large \gamma} \approx 1.4$ can be used for dry air in such calculations as the speed of sound.
 
 #### Polyatomic molecules
 
