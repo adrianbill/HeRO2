@@ -38,8 +38,7 @@ double O2_calibration; // Calibration value (%/mV)
 // calibrated distance in m
 double dist_cal = 0.04805;
 
-// Running Average Setup
-RunningAverage RA_He(10);
+
 
 void setup()
 {
@@ -62,28 +61,14 @@ void setup()
     // Ultrasonic initialise
     ultrasonic_Initialise();
 
-    RA_He.clear();
+    // helium initialization
+    He_Initialise();
 
     O2_calibration = calibrate_oxygen();
-
-    // Serial.print(" Cal: ");
-    // Serial.println(O2_calibration);
-
-    // for (int i = 0; i <= 4; i++)
-    // {
-
-    //     Serial.print("O₂ Calibration No. ");
-    //     Serial.print(i);
-    //     calibrate_oxygen();
-    //     Serial.print(" Cal: ");
-    //     Serial.println(O2_calibration);
-
-    // }
 }
 
 void loop()
 {
-    // To be measured
     // double x_O2 = 0.209; // Oxygen fraction
     // double T = 293.0; // Temperature in Kelvin
     double x_O2 = measure_oxygen(O2_calibration);
@@ -95,13 +80,11 @@ void loop()
     // calibrate_distance (2, T, x_H2O);
 
     double x_He = measure_helium(x_O2, x_H2O, c_mea, T);
-    // double x_He = 0;
 
     // Display the O2, He fractions and Temperature
     displayValues(x_O2, x_He, T, hum);
     serialdisplayValues(c_mea, x_O2, x_He, x_H2O, hum, T);
 
-    // measure_oxygen();
     delay(500);
 }
 

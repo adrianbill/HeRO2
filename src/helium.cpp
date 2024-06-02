@@ -10,6 +10,15 @@
 // Paired Header
 #include "helium.h"
 
+// Running Average Setup
+RunningAverage RA_He(10);
+
+// helium initialization
+void He_Initialise()
+{
+    RA_He.clear();
+}
+
 // function to trigger helium reading
 double measure_helium(double x_O2, double x_H2O, double c_mea, double T)
 {
