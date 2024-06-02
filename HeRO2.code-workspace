@@ -1,10 +1,10 @@
 {
 	"folders": [
-		{
-			"name": "HeRO2",
-			"path": "."
-		}
-	],
+        {
+            "name": "HeRO2",
+            "path": "."
+        }
+    ],
 	"settings": {
 		"files.associations": {
 			"*.tcc": "cpp",
