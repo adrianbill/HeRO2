@@ -14,7 +14,7 @@
 #include "temp_hum.h"       // temperature, humidity, water% calcs
 #include "ultrasonic.h"     // ultrasonic measurement
 #include "speed_of_sound.h" // speed of sound calculations
-#include "menu.h"           // menu logic
+//#include "menu.h"           // menu logic
 #include "helium.h"      // helium calculations
 
 // function declarations

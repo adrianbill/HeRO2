@@ -31,7 +31,7 @@ const int buttonSelectPin = 26;
 int selectedItem = 0;
 bool inSubMenu = false;
 
-void setup() {
+void menu_initialise() {
   pinMode(buttonUpPin, INPUT_PULLUP);
   pinMode(buttonDownPin, INPUT_PULLUP);
   pinMode(buttonSelectPin, INPUT_PULLUP);
@@ -50,7 +50,7 @@ void setup() {
   drawMenu();
 }
 
-void loop() {
+void menu_navigation() {
   // Check if the select button is pressed
   if (digitalRead(buttonSelectPin) == LOW) {
     if (!inSubMenu) {
@@ -135,6 +135,11 @@ void drawSubMenu() {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
   display.print(menuItems[selectedItem]);
+
+
+  // Matsh Case to display & run the correct functions
+
+
 
   // Display the "Return to Menu" option
   display.setCursor(0, SCREEN_HEIGHT - 8);
