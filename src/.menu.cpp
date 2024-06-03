@@ -18,6 +18,7 @@ const char *menuItems[] =
         "Nitrox",
         "Trimix",
         "Raw Data"};
+        
 const int menuLength = sizeof(menuItems) / sizeof(menuItems[0]);
 
 // Button pins
