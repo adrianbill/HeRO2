@@ -51,7 +51,7 @@ void menu_initialise()
     drawMenu();
 }
 
-void menu_navigation()
+void main_menu_navigation()
 {
     // Check if the select button is pressed
     if (digitalRead(buttonSelectPin) == LOW)

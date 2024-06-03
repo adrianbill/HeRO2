@@ -2,7 +2,7 @@
 #define MENU_H
 
 void menu_initialise();
-void menu_navigation();
+void main_menu_navigation();
 void drawMenu();
 void drawSubMenu();
 
