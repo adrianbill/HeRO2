@@ -107,25 +107,25 @@ void drawMenu() {
     if (itemIndex < menuLength) {
       if (itemIndex == selectedItem) {
         // Draw a box around the selected item
-        display.drawRect(0, i * 20 + 4, SCREEN_WIDTH - 2 , 16, SSD1306_WHITE);
-        display.setCursor(1, i * 20 + 4 + 4);
-        display.print(" ");
+        display.drawRect(0, i * 20 + 4, SCREEN_WIDTH, 16, SSD1306_WHITE);
+        display.setCursor(SCREEN_WIDTH - 10, i * 20 + 4 + 4);
+        // display.print(" ");
+        display.write(17);
+        // display.print(" ");
+      
+        display.setCursor(5, i * 20 + 4 + 4);
         display.write(16);
         display.print(" ");
+
       } 
       else 
       {
-        display.setCursor(1, i * 20 + 4 + 4);
-        display.print("  ");
-        //display.write(7);
-        display.print(" ");
+        display.setCursor(30, i * 20 + 4 + 4);
+        //display.print("   ");
       }
 
       display.print(menuItems[itemIndex]);
     }
-  }
-
-  display.display();
 }
 
 void drawSubMenu() {
