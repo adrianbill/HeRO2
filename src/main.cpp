@@ -34,6 +34,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Oxygen Analysis setup
 double O2_calibration; // Calibration value (%/mV)
+double O2_cal_target = 0.209;
 
 // calibrated distance in m
 double dist_cal = 0.04805;
@@ -64,7 +65,7 @@ void setup()
     // helium initialization
     He_Initialise();
 
-    O2_calibration = calibrate_oxygen();
+    O2_calibration = calibrate_oxygen(O2_cal_target);
 }
 
 void loop()

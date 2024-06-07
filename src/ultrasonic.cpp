@@ -1,7 +1,6 @@
 // Libraries
 #include <Arduino.h>          // Basic Library
 #include <RunningAverage.h>   // Running Average Library
-#include <Adafruit_ADS1X15.h> // ADC / Amplifier Library
 
 // custom headers
 #include "speed_of_sound.h"
