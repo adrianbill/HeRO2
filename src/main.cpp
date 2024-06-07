@@ -5,7 +5,7 @@
 #include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
 #include <Adafruit_GFX.h>     // Graphic Library
 #include <Adafruit_SSD1306.h> // Display Library
-#include <Adafruit_ADS1X15.h> // ADC / Amplifier Library
+#include <ADS1X15.h>        // ADC / Amplifier Library
 #include <RunningAverage.h>   // Running Average Library
 
 // Custom Headers

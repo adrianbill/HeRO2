@@ -1,19 +1,18 @@
 // Libraries
-#include <Arduino.h>          // Basic Library
-#include <Wire.h>             // I2C Library
-#include <RunningAverage.h>   // Running Average Library
-#include <Adafruit_ADS1X15.h> // ADC / Amplifier Library
+#include <Arduino.h>        // Basic Library
+#include <Wire.h>           // I2C Library
+#include <RunningAverage.h> // Running Average Library
+#include <ADS1X15.h>        // ADC / Amplifier Library
 
 // Paired Header
 #include "oxygen.h"
 
 // Define ADC address (Amplifier)
-Adafruit_ADS1115 O2ADC;
-const float multiplier = 0.0625F; // ADC value/bit for gain of 2
-// const double multiplier = 0.0078125; // ADC value/bit for gain of 16
+ADS1115 O2ADC(0x48);
 
 // O2 running average setup
-RunningAverage RA_O2(10);
+RunningAverage RA_O2_measure(20);
+RunningAverage RA_O2_calibration(20);
 
 // Initialiases Analog to Digital Converter for O2 Sensor and clear running average
 void O2_Initialise()
@@ -25,65 +24,58 @@ void O2_Initialise()
             ;
     }
 
-    O2ADC.setGain(GAIN_TWO); // Set ADC gain
+    O2ADC.setGain(16);
 
-    RA_O2.clear();
+    RA_O2_measure.clear();
 }
 
 // Function to calibration Oxygen
-double calibrate_oxygen()
+double calibrate_oxygen(double target_O2)
 {
-    // Running Average Setup
-    RunningAverage RA_O2C(450);
 
-    RA_O2C.clear();
+    RA_O2_calibration.clear();
 
-    int calCount = 500; // Calibration samples
+    int calCount = 50; // Calibration samples
 
     for (int i = 0; i <= calCount; i++)
     {
-        double millivolts = O2ADC.readADC_SingleEnded(0); // Read differental voltage between ADC pins 0 & 1
-        RA_O2C.addValue(millivolts);
+        int16_t reading = O2ADC.readADC_Differential_0_1();
+        RA_O2_calibration.addValue(reading);
         delay(10);
     }
 
-    // Compute calValue
-    double mv_mea = RA_O2C.getAverage();
-    mv_mea = mv_mea * multiplier;
+    // converts reading to voltage in mV
+    double millivolts = ads.toVoltage(RA_O2_calibration.getAverage()) * 1000;
 
-    Serial.print("mv_mea: ");
-    Serial.print(mv_mea);
-    Serial.print("  cal: ");
-    Serial.println(0.209 / mv_mea, 8);
+    Serial.print("Voltage: ");
+    Serial.print(millivolts, 2);
+    Serial.print("mV");
+    Serial.print(" ±");
+    Serial.print(RA_O2_calibration.getStandardDeviation(), 2);
+    Serial.println("mV");
 
-    return (0.209 / mv_mea);
+    return target_O2 / millivolts;
 }
 
 // Function to measure Oxygen
-double measure_oxygen(double O2_cal)
+double measure_oxygen(double O2_cal_factor)
 {
 
-    double millivolts = O2ADC.readADC_SingleEnded(0);
-    RA_O2.addValue(millivolts);
+    int16_t reading = O2ADC.readADC_Differential_0_1();
 
-    double mv_mea = RA_O2.getAverage();
+    RA_O2_measure.addValue(reading);
 
-    mv_mea = mv_mea * multiplier;
+    // converts average reading to voltage in mV
+    double voltage_meas = O2ADC.tovoltage(RA_O2_measure.getAverage()) * 1000;
 
-    Serial.print("Ave: ");
-    Serial.print(mv_mea, 2);
+    Serial.print("Voltage: ");
+    Serial.print(voltage_meas, 2);
     Serial.print("mV");
+    Serial.print("  ||  O₂: ");
+    Serial.print(voltage_meas * O2_cal_factor, 2);
+    Serial.print("% ±");
+    Serial.print(O2ADC.tovoltage(RA_O2_measure.getStandardDeviation()) * 1000, 2);
+    Serial.println("%");
 
-    Serial.print("Cal: ");
-    Serial.print(O2_cal, 9);
-
-    // Serial.print(" || Std.d: ");
-    // Serial.print(RA_O2.getStandardDeviation() * multiplier, 2);
-    // Serial.print("mV");
-
-    // Serial.print(" || Max: ");
-    // Serial.print(RA_O2.getMaxInBuffer() * multiplier, 2);
-    // Serial.println("mV");
-
-    return mv_mea * O2_cal; // Convert mV ADC reading to % O2
+    return voltage_meas * O2_cal_factor; // Convert mV ADC reading to % O2
 }
