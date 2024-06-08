@@ -1,9 +1,10 @@
-#ifndef TEMP_HUM_H
-#define TEMP_HUM_H
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
 
+void Environment_Initialise();
 double temperature_measurement();
 double humidity_measurement();
+double atmpressure_measurement();
 double measure_water(double, double, double);
-void Temp_Initialise();
 
 #endif

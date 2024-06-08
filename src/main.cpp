@@ -5,17 +5,17 @@
 #include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
 #include <Adafruit_GFX.h>     // Graphic Library
 #include <Adafruit_SSD1306.h> // Display Library
-#include <ADS1X15.h>        // ADC / Amplifier Library
+#include <ADS1X15.h>          // ADC / Amplifier Library
 #include <RunningAverage.h>   // Running Average Library
 
 // Custom Headers
 #include "constants.h"      // Global Constants
 #include "oxygen.h"         // oxygen calculations
-#include "temp_hum.h"       // temperature, humidity, water% calcs
+#include "environment.h"    // environmenttal parameters: temperature, humidity, atmospheric pressure
 #include "ultrasonic.h"     // ultrasonic measurement
 #include "speed_of_sound.h" // speed of sound calculations
-//#include "menu.h"           // menu logic
-#include "helium.h"      // helium calculations
+// #include "menu.h"           // menu logic
+#include "helium.h"         // helium calculations
 
 // function declarations
 
@@ -38,8 +38,6 @@ double O2_cal_target = 0.209;
 
 // calibrated distance in m
 double dist_cal = 0.04805;
-
-
 
 void setup()
 {
