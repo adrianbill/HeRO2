@@ -22,5 +22,5 @@ Gas analyser with other extravagant features to complicated and simply divering
   - Helium ($He$)
   - Oxygen ($O_2$)
   - Nitrogen ($N_2$)
-  - Water ($H_2O$)
+  - Water ($H_2$)
 - Carbon Monoxide ($CO$) levels will only be used as a safety measure.

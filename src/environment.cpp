@@ -46,10 +46,10 @@ double humidity_measurement()
     return RA_humidity.getAverage();
 }
 
-// Relative Humidity Measurement Function
+// Atmospheric Pressure Measurement Function in kPa
 double atmpressure_measurement()
 {
-    double atmpress_measure = bme.pres();
+    double atmpress_measure = bme.pres() / 10; // reads pressure in hPa and converts to kPa
     RA_atmpressure.addValue(atmpress_measure);
     return RA_atmpressure.getAverage();
 }
@@ -60,6 +60,6 @@ double measure_water(double temperature, double hum, double pres_atm)
     double temperature_C = temperature - 273.15; // convert K to C
 
     // calculate saturation vapour pressure of water kPa
-    double pres_sat = 0.61078 * exp((17.27 * (temperature - 273.15) / ((temperature - 273.15) + 237.3)); // Tetens equation
+    double pres_sat = 0.61078 * exp((17.27 * (T - 273.15) / ((temperature - 273.15) + 237.3)); // Tetens equation
     return (pres_sat * hum) / pres_atm;                             // calculate x_H20
 }
