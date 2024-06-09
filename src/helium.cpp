@@ -20,7 +20,7 @@ void He_Initialise()
 }
 
 // function to trigger helium reading
-double measure_helium(double x_O2, double x_H2O, double c_mea, double T)
+double helium_measurement(double x_O2, double x_H2O, double c_mea, double T)
 {
 
     double x_N2 = 1.0 - x_O2 - x_H2O; // Assume N2 makes up the rest

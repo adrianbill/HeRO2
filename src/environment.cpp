@@ -13,7 +13,7 @@ BME280I2C bme;
 // Running Average Setup
 RunningAverage RA_temperature(10);
 RunningAverage RA_humidity(10);
-RunningAverage RA_atmpressure(10);
+RunningAverage RA_pressure(10);
 
 // Initialize HTU21D sensor and clear running averages
 void Environment_Initialise()
@@ -27,7 +27,7 @@ void Environment_Initialise()
 
     RA_temperature.clear();
     RA_humidity.clear();
-    RA_atmpressure.clear();
+    RA_pressure.clear();
 }
 
 // Temperature Measurement Function in Kelvin
@@ -49,20 +49,20 @@ double humidity_measurement()
 // Atmospheric Pressure Measurement Function in kPa
 double atmpressure_measurement()
 {
-    double atmpress_measure = bme.pres() / 10; // reads pressure in hPa and converts to kPa
-    RA_atmpressure.addValue(atmpress_measure);
-    return RA_atmpressure.getAverage();
+    double pressure_total = bme.pres() / 10; // reads pressure in hPa and converts to kPa
+    RA_pressure.addValue(pressure_total);
+    return RA_pressure.getAverage();
 }
 
 // Function to calculate the fraction of water in gas using relative humidity
-double measure_water(double temperature_K, double hum, double pres_atm)
+double water_measurement(double temperature_K, double hum, double pressure_total)
 {
     //convert temperature from K to C
-    double temperature_C = temperature_K - 273.15
+    double temperature_C = temperature_K - 273.15;
 
 
     // calculate saturation vapour pressure of water kPa using Tetens equation 
-    double pres_sat = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3)); 
+    double pressure_saturation = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3)); 
     // calculate x_H20
-    return (pres_sat * hum) / pres_atm;                             
+    return (pressure_saturation * hum) / pressure_total;                             
 }

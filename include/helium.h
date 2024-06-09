@@ -2,6 +2,6 @@
 #define HELIUM_H
 
 void He_Initialise();
-double measure_helium(double, double, double, double);
+double helium_measurement(double, double, double, double);
 
 #endif

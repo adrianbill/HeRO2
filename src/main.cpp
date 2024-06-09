@@ -36,8 +36,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 double O2_calibration; // Calibration value (%/mV)
 double O2_cal_target = 0.209;
 
-// calibrated distance in m
-double dist_cal = 0.04805;
+
 
 void setup()
 {
@@ -72,19 +71,19 @@ void loop()
     double humidity = humidity_measurement(); // % relative humidity
     double pressure = atmpressure_measurement(); // kiloPascal
 
-    double x_O2 = measure_oxygen(O2_calibration);
-    double x_H2O = measure_water(temperature, humidity, pressure);
+    double x_O2 = oxygen_measurement(O2_calibration);
+    double x_H2O = water_measurement(temperature, humidity, pressure);
 
-    double c_mea = speed_measurement(dist_cal); // Speed of sound in m/s
+    double speed_of_sound = speed_measurement(distance_calibrated); // Speed of sound in m/s
 
 
     // calibrate_distance (2, T, x_H2O);
 
-    double x_He = measure_helium(x_O2, x_H2O, c_mea, T);
+    double x_He = helium_measurement(x_O2, x_H2O, speed_of_sound, temperature);
 
     // Display the O2, He fractions and Temperature
-    displayValues(x_O2, x_He, T, hum);
-    serialdisplayValues(c_mea, x_O2, x_He, x_H2O, hum, T);
+    displayValues(x_O2, x_He, T, humidity);
+    serialdisplayValues(c_mea, x_O2, x_He, x_H2O, humidity, temperature);
 
     delay(500);
 }

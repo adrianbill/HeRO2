@@ -2,7 +2,7 @@
 #define OXYGEN_H
 
 double calibrate_oxygen(double);
-double measure_oxygen(double);
+double oxygen_measurement(double);
 void O2_Initialise();
 
 #endif

@@ -58,7 +58,7 @@ double calibrate_oxygen(double target_O2)
 }
 
 // Function to measure Oxygen
-double measure_oxygen(double O2_cal_factor)
+double oxygen_measurement(double O2_cal_factor)
 {
 
     int16_t reading = O2ADC.readADC_Differential_0_1();
