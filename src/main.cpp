@@ -48,13 +48,13 @@ void setup()
     // Initialise I2C
     Wire.begin();
 
-    // Temp Sensor Initialise
-    Temp_Initialise();
+    // Temperature, Relative Humidity, and pressure Sensor Initialise
+    Environment_Initialise();
 
     // Display Initialise
     Display_Initialise();
 
-    // O2 Initialise
+    // Oxygen sensor Initialise
     O2_Initialise();
 
     // Ultrasonic initialise
@@ -68,13 +68,15 @@ void setup()
 
 void loop()
 {
-    // double x_O2 = 0.209; // Oxygen fraction
-    // double T = 293.0; // Temperature in Kelvin
+    double temperature = temperature_measurement(); // Kelvin
+    double humidity = humidity_measurement(); // % relative humidity
+    double pressure = atmpressure_measurement(); // kiloPascal
+
     double x_O2 = measure_oxygen(O2_calibration);
-    double T = temperature_measurement();       // Measure the temperature
+    double x_H2O = measure_water(temperature, humidity, pressure);
+
     double c_mea = speed_measurement(dist_cal); // Speed of sound in m/s
-    double hum = humidity_measurement();
-    double x_H2O = measure_water(T, hum, pres_atm);
+
 
     // calibrate_distance (2, T, x_H2O);
 
