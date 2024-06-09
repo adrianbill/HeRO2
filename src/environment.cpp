@@ -55,11 +55,14 @@ double atmpressure_measurement()
 }
 
 // Function to calculate the fraction of water in gas using relative humidity
-double measure_water(double temperature, double hum, double pres_atm)
+double measure_water(double temperature_K, double hum, double pres_atm)
 {
-    double temperature_C = temperature - 273.15; // convert K to C
+    //convert temperature from K to C
+    double temperature_C = temperature_K - 273.15
 
-    // calculate saturation vapour pressure of water kPa
-    double pres_sat = 0.61078 * exp((17.27 * (T - 273.15) / ((temperature - 273.15) + 237.3)); // Tetens equation
-    return (pres_sat * hum) / pres_atm;                             // calculate x_H20
+
+    // calculate saturation vapour pressure of water kPa using Tetens equation 
+    double pres_sat = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3)); 
+    // calculate x_H20
+    return (pres_sat * hum) / pres_atm;                             
 }
