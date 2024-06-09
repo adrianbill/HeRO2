@@ -45,10 +45,10 @@ double measure_duration()
 }
 
 // speed of sound measurement
-double speed_measurement(double distance)
+double speed_measurement()
 {
     double duration = measure_duration();
-    return distance / duration; // Calculate the speeds in m/s
+    return distance_calibrated / duration; // Calculate the speeds in m/s
 }
 
 // Function to calibrate distance

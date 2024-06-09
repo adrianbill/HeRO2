@@ -16,3 +16,6 @@
     extern constexpr double M_O2{0.03200};
     extern constexpr double M_N2{0.02802};
     extern constexpr double M_H2O{0.01802};
+
+    // calibrated distance in m
+    extern constexpr double distance_calibrated{0.04805};

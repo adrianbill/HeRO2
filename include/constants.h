@@ -18,5 +18,7 @@
     extern const double M_N2;
     extern const double M_H2O;
 
+    // calibrated distance in m
+    extern const double distance_calibrated;
 
 #endif
