@@ -33,7 +33,7 @@ void Display_Initialise();
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Oxygen Analysis setup
-double O2_calibration; // Calibration value (%/mV)
+double O2_calibration = 0; // Calibration value (%/mV)
 double O2_cal_target = 0.209;
 
 
@@ -74,7 +74,7 @@ void loop()
     double x_O2 = oxygen_measurement(O2_calibration);
     double x_H2O = water_measurement(temperature, humidity, pressure);
 
-    double speed_of_sound = speed_measurement(distance_calibrated); // Speed of sound in m/s
+    double speed_of_sound = speed_measurement(); // Speed of sound in m/s
 
 
     // calibrate_distance (2, T, x_H2O);
