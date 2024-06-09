@@ -7,7 +7,7 @@
 // Paired Header
 #include "environment.h"
 
-// Define Bosch BM$280 sensor
+// Define Bosch BME280 sensor
 BME280I2C bme;
 
 // Running Average Setup
