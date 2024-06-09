@@ -5,9 +5,6 @@
       // Universal Gas constant, J/(mol.K)
     extern constexpr double R{8.314462618};
 
-    // Atmospheric Pressure (kPa)
-    extern constexpr double pres_atm{101.325};
-
     // Adiabatic Indices
     extern constexpr double gamma_He{1.666};
     extern constexpr double gamma_O2{1.394};

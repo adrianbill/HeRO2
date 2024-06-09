@@ -6,9 +6,6 @@
     // Universal Gas constant, J/(mol.K)
     extern const double R;
 
-    // Atmospheric Pressure (kPa)
-    extern const double pres_atm;
-
     // Adiabatic Indices
     extern const double gamma_He;
     extern const double gamma_O2;
