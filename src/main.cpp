@@ -82,8 +82,8 @@ void loop()
     double x_He = helium_measurement(x_O2, x_H2O, speed_of_sound, temperature);
 
     // Display the O2, He fractions and Temperature
-    displayValues(x_O2, x_He, T, humidity);
-    serialdisplayValues(c_mea, x_O2, x_He, x_H2O, humidity, temperature);
+    displayValues(x_O2, x_He, temperature, humidity);
+    serialdisplayValues(speed_of_sound, x_O2, x_He, x_H2O, humidity, temperature);
 
     delay(500);
 }
