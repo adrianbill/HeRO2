@@ -1,4 +1,4 @@
-#include <Arduino.h>        // Basic Library
+#include <Arduino.h> // Basic Library
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -19,7 +19,7 @@ const char *menuItems[] =
         "Nitrox",
         "Trimix",
         "Raw Data"};
-        
+
 const int menuLength = sizeof(menuItems) / sizeof(menuItems[0]);
 
 // Button pins
@@ -49,8 +49,9 @@ void menu_initialise()
     display.display();
     delay(2000);
     display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
 
-    drawMenu();
+    draw_menu();
 }
 
 void main_menu_navigation()
@@ -61,7 +62,7 @@ void main_menu_navigation()
         if (!inSubMenu)
         {
             inSubMenu = true;
-            drawSubMenu();
+            draw_submenu();
         }
         delay(200); // debounce delay
     }
@@ -76,7 +77,7 @@ void main_menu_navigation()
             {
                 selectedItem = menuLength - 1;
             }
-            drawMenu();
+            draw_menu();
             delay(200); // debounce delay
         }
 
@@ -88,7 +89,7 @@ void main_menu_navigation()
             {
                 selectedItem = 0;
             }
-            drawMenu();
+            draw_menu();
             delay(200); // debounce delay
         }
     }
@@ -98,13 +99,13 @@ void main_menu_navigation()
         if (digitalRead(buttonDownPin) == LOW)
         {
             inSubMenu = false;
-            drawMenu();
+            draw_menu();
             delay(200); // debounce delay
         }
     }
 }
 
-void drawMenu()
+void draw_menu()
 {
     display.clearDisplay();
 
@@ -120,7 +121,7 @@ void drawMenu()
     for (int i = 0; i < 3; i++)
     {
         int itemIndex = (displayOffset + i) % menuLength;
-        display.setTextColor(SSD1306_WHITE);
+
         if (itemIndex < menuLength)
         {
             if (itemIndex == selectedItem)
@@ -147,16 +148,32 @@ void drawMenu()
     }
 }
 
-void drawSubMenu()
+void draw_submenu()
 {
     display.clearDisplay();
 
     // Display the selected item name
-    display.setTextColor(SSD1306_WHITE);
+
     display.setCursor(0, 0);
     display.print(menuItems[selectedItem]);
 
-    // Matsh Case to display & run the correct functions
+    // Display the "Return to Menu" option
+    display.setCursor(0, SCREEN_HEIGHT - 8);
+    display.print("Menu");
+
+    display.display();
+}
+
+// Add functions for each menu display
+
+void draw_raw_data()
+{
+    // does not clear screen as it is intended to display over draw_submenu
+
+    //
+
+    display.setCursor(0, 0);
+    display.print(menuItems[selectedItem]);
 
     // Display the "Return to Menu" option
     display.setCursor(0, SCREEN_HEIGHT - 8);

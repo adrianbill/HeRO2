@@ -3,7 +3,7 @@
 
 void menu_initialise();
 void main_menu_navigation();
-void drawMenu();
-void drawSubMenu();
+void draw_menu();
+void draw_submenu();
 
 #endif
