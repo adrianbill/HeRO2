@@ -28,7 +28,7 @@ struct menu_state
 #define ICON_Y 32 + ICON_GAP - 4
 #define ICON_Y_Text ICON_Y
 #define ICON_W_2nd_Letter 27
-#define Elements 7
+#define Elements 6
 
 struct menu_entry_type menu_entry_list[Elements] =
     {
@@ -37,7 +37,6 @@ struct menu_entry_type menu_entry_list[Elements] =
         {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibration"},
         {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Environment"},
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
-        {u8g2_font_open_iconic_embedded_4x_t, 66, 0, "Settings"},
         {NULL, 0, 0, NULL}};
 
 int8_t button_event = 0; // set this to 0, once the event has been processed
@@ -262,12 +261,43 @@ void run_submenu()
     u8g2.firstPage();
     do
     {
-        u8g2.setFont(u8g2_font_helvR08_te);
+        u8g2.setFont(u8g2_font_unifont_te);
         u8g2.drawStr(0, 8, menu_entry_list[destination_state.position].name);
 
-        draw_raw_data();
+        switch (destination_state.position)
+        {
+        case 0: // Nitrox
+            u8g2.drawUTF8(0, 12 * 3, "   O₂: 12.2 %");
+            u8g2.drawUTF8(0, 12 * 4, "       24.7 mV");
+            u8g2.drawUTF8(0, 12 * 5, "  H₂O: 51.1 %");
 
-        u8g2.drawStr(0, 64, "Back");
+            break;
+        case 1: // Trimix
+            u8g2.drawUTF8(0, 12 * 3, "   O₂: 12.2 %");
+            u8g2.drawUTF8(0, 12 * 4, "   He: 24.7 %");
+            u8g2.drawUTF8(0, 12 * 5, "  H₂O: 51.1 %");
+            break;
+        case 2: // Calibrate
+
+
+
+            break;            
+        case 3: // Environment
+            u8g2.drawUTF8(0, 12 * 3, " Temp: 21.7°C");
+            u8g2.drawUTF8(0, 12 * 4, "R.Hum: 51.1 %");
+            u8g2.drawUTF8(0, 12 * 5, "Press: 10.1 hPa");
+            break;
+        case 4: // Raw Data
+            u8g2.drawUTF8(0, 11 * 1, "   O₂: 12.2 mV");
+            u8g2.drawUTF8(0, 12 * 2, "  Dur: 24.7 µs");
+            u8g2.drawUTF8(0, 12 * 3, " Temp: 21.7°C");
+            u8g2.drawUTF8(0, 12 * 4, "R.Hum: 51.1 %");
+            u8g2.drawUTF8(0, 12 * 5, "Press: 10.1 hPa");
+            break;
+        }
+
+        // case statement incorporate "draw" functions
+
         check_button_event();
     } while (u8g2.nextPage());
 }
@@ -282,21 +312,4 @@ void navigate_submenu()
     {
         button_event = 0;
     }
-}
-
-void draw_raw_data()
-{
-    u8g2.setFont(u8g2_font_unifont_te);
-    u8g2.firstPage();
-    do
-    {
-
-    // u8g2.setCursor(0, 24);
-    u8g2.drawUTF8(0, 24, "Dur: 24.7 µs");	
-    // u8g2.print("O2: 12.2 mV");
-    // u8g2.print("Dur: 24.7 µs");
-    u8g2.drawUTF8(0, 44, "Tem: 21.7°C");
-    u8g2.drawStr(0, 54, "R.Hum: 51.1%");
-
-    u8g2.drawStr(0, 64, "Back");
 }
