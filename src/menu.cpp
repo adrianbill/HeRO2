@@ -288,7 +288,7 @@ void run_submenu()
 
     double O2_fraction = 20.004532;
     double He_fraction = 35.004532;
-    double H2O_fraction = 2.56;
+    double H2O_fraction = 2.561562;
 
     double temperature = 24.55532;
     double relative_humidity = 35.004532;
@@ -312,29 +312,41 @@ void run_submenu()
     case 0: // Nitrox
         u8g2.setFont(u8g2_font_helvR08_te);
 
-        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 00.0%"), y_start);
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 0.00%"), y_start);
         u8g2.print("H₂O ");
-        u8g2.print(H2O_fraction);
+        u8g2.print(H2O_fraction,1);
         u8g2.print("%");
 
-        u8g2.setFont(u8g2_font_helvR12_tr);
+        u8g2.setFont(u8g2_font_helvR10_tr);
         x_gap = (u8g2.getDisplayWidth() - u8g2.getStrWidth("Oxygen")) / 2;
-        u8g2.drawUTF8(x_gap, 18 + y_start, "Oxygen");
+        u8g2.drawUTF8(x_gap, 14 + y_start, "Oxygen");
         u8g2.drawHLine(x_gap - 1, 18 + y_start + 2, u8g2.getStrWidth("Oxygen") + 1);
 
         u8g2.setFont(u8g2_font_helvR24_te);
 
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("00.00%")) / 2, u8g2.getDisplayHeight() - 4);
+        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("00.00%")) / 2, u8g2.getDisplayHeight() - 14);
         u8g2.print(O2_fraction, 2);
+        u8g2.print("%");
+
+        u8g2.setFont(u8g2_font_helvR08_te);
+
+        u8g2.setCursor(0, u8g2.getDisplayHeight() - 3);
+        u8g2.print("O₂ Cell: ");
+        u8g2.print(O2_millivolts, 1);
+        u8g2.print(" mV");
+
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 0.00%"), u8g2.getDisplayHeight() - 3);
+        u8g2.print("H₂O ");
+        u8g2.print(H2O_fraction);
         u8g2.print("%");
 
         break;
     case 1: // Trimix
         u8g2.setFont(u8g2_font_helvR08_te);
 
-        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 00.0%"), y_start);
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 0.00%"), y_start);
         u8g2.print("H₂O ");
-        u8g2.print(H2O_fraction);
+        u8g2.print(H2O_fraction,2);
         u8g2.print("%");
 
         u8g2.setFont(u8g2_font_helvR18_te);
@@ -413,14 +425,13 @@ void run_submenu()
 
         // u8g2.drawUTF8(0, y_gap * 2 + y_start, "T: 21.7°C");
         u8g2.setCursor(0, y_gap * 2 + y_start);
-        u8g2.print("T: ");
+        u8g2.print("Tem:");
         u8g2.print(temperature, 1);
         u8g2.print("°C");
 
         // u8g2.drawUTF8(u8g2.getDisplayWidth() / 2 + 4, y_gap * 2 + y_start, "RH: 51.1%");
-        u8g2.setCursor(0, y_gap * 2 + y_start);
-        u8g2.print("R.Hum");
-        u8g2.setCursor(x_gap, y_gap * 2 + y_start);
+        u8g2.setCursor(u8g2.getDisplayWidth() / 2 + 2, y_gap * 2 + y_start);
+        u8g2.print("RHu: ");
         u8g2.print(relative_humidity, 1);
         u8g2.print("%");
 
@@ -428,7 +439,7 @@ void run_submenu()
 
         // u8g2.drawUTF8(0, y_gap * 3 + y_start, "Atm Press: 10.1 hPa");
         u8g2.setCursor(0, y_gap * 3 + y_start);
-        u8g2.print("Press: ");
+        u8g2.print("Atm Press: ");
         u8g2.print(local_pressure, 1);
         u8g2.print(" hPa");
 
