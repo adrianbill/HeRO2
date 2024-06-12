@@ -4,6 +4,7 @@
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
+// Menu element struct definition
 struct menu_entry_type
 {
     const uint8_t *font;
@@ -12,6 +13,7 @@ struct menu_entry_type
     const char *name;
 };
 
+// Menu state struct definition
 struct menu_state
 {
     int16_t menu_start;     /* in pixel */
@@ -20,7 +22,6 @@ struct menu_state
 };
 
 // Icon configuration
-
 #define ICON_WIDTH 40
 #define ICON_HEIGHT 38
 #define ICON_GAP 4
@@ -28,14 +29,21 @@ struct menu_state
 #define ICON_Y 32 + ICON_GAP - 4
 #define ICON_Y_Text ICON_Y
 #define ICON_W_2nd_Letter 27
-#define Elements 6
+#define ELEMENTS 6 // number of elements in menu + null element
 
-struct menu_entry_type menu_entry_list[Elements] =
+// Button pin configuration
+#define NEXT_PIN 25
+#define SELECT_PIN 26
+#define PREV_PIN 27
+
+// Main Menu items
+// {font, icon character 1, icon character 2, Title} second icon character used for O2 & He lemements
+struct menu_entry_type menu_entry_list[ELEMENTS] =
     {
-        {u8g2_font_helvR24_te, 79, 8322, "Nitrox"},
-        {u8g2_font_helvR24_te, 72, 101, "Trimix"},
+        {u8g2_font_helvR24_te, 79, 8322, "Nitrox"}, // 79 = "O", 8322 = "₂"
+        {u8g2_font_helvR24_te, 72, 101, "Trimix"},  // 72 = "H", 101 = "e"
         {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibration"},
-        {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Environment"},
+        {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Climate"},
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
         {NULL, 0, 0, NULL}};
 
@@ -55,7 +63,7 @@ View current_view = MAIN_MENU;
 // Functions
 void display_initialise();
 void check_button_event();
-void draw(struct menu_state *state);
+void draw_main(struct menu_state *state);
 void to_right(struct menu_state *state);
 void to_left(struct menu_state *state);
 uint8_t towards_int16(int16_t *current, int16_t dest);
@@ -91,9 +99,10 @@ void loop()
 
 void display_initialise()
 {
-    u8g2.begin(/*Select=*/26, /*Right/Next=*/25, /*Left/Prev=*/27);
+    u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN);
     u8g2.enableUTF8Print();
-    u8g2.setFont(u8g2_font_helvR12_te);
+    // u8g2.setFont(u8g2_font_unifont_te);
+    u8g2.setFont(u8g2_font_helvR10_te);
 }
 
 void check_button_event()
@@ -102,7 +111,7 @@ void check_button_event()
         button_event = u8g2.getMenuEvent();
 }
 
-void draw(struct menu_state *state)
+void draw_main(struct menu_state *state)
 {
     int16_t x;
     uint8_t i;
@@ -113,31 +122,41 @@ void draw(struct menu_state *state)
         if (x >= -ICON_WIDTH && x < u8g2.getDisplayWidth())
         {
             u8g2.setFont(menu_entry_list[i].font);
-
-            int16_t x0_adjusted = x;
-            int16_t y0_adjusted = ICON_Y;
-            int16_t x1_adjusted = 0;
-            int16_t y1_adjusted = 0;
+            int16_t x0;
+            int16_t y0;
+            int16_t x1;
+            int16_t y1;
 
             switch (i)
             {
             case 0:
-                x0_adjusted = x + 2;
-                x1_adjusted = x + ICON_W_2nd_Letter;
-                y1_adjusted = ICON_Y - 3;
+                x0 = x + 2;
+                y0 = ICON_Y;
+                x1 = x + ICON_W_2nd_Letter;
+                y1 = ICON_Y - 3;
+
+                u8g2.drawGlyph(x0, y0, menu_entry_list[i].icon0);
+                u8g2.drawGlyph(x1, y1, menu_entry_list[i].icon1);
+
                 break;
             case 1:
-                x1_adjusted = x + ICON_W_2nd_Letter - 6;
-                y1_adjusted = ICON_Y;
+                x0 = x;
+                y0 = ICON_Y;
+                x1 = x + ICON_W_2nd_Letter - 6;
+                y1 = ICON_Y;
+
+                u8g2.drawGlyph(x0, y0, menu_entry_list[i].icon0);
+                u8g2.drawGlyph(x1, y1, menu_entry_list[i].icon1);
+
                 break;
             default:
-                x0_adjusted = x + 4;
-                y0_adjusted = ICON_Y + 4;
+                x0 = x + 4;
+                y0 = ICON_Y + 4;
+
+                u8g2.drawGlyph(x0, y0, menu_entry_list[i].icon0);
+
                 break;
             }
-
-            u8g2.drawGlyph(x0_adjusted, y0_adjusted, menu_entry_list[i].icon0);
-            u8g2.drawGlyph(x1_adjusted, y1_adjusted, menu_entry_list[i].icon1);
         }
         i++;
         x += ICON_WIDTH + ICON_GAP;
@@ -145,8 +164,7 @@ void draw(struct menu_state *state)
     }
     u8g2.drawFrame(state->frame_position - 1, ICON_Y - ICON_HEIGHT + 7, ICON_WIDTH + 2, ICON_WIDTH);
     u8g2.drawFrame(state->frame_position - 2, ICON_Y - ICON_HEIGHT + 6, ICON_WIDTH + 4, ICON_WIDTH + 2);
-    // u8g2.drawFrame(state->frame_position - 2, ICON_Y - ICON_HEIGHT - 2, ICON_WIDTH + 4, ICON_WIDTH + 4);
-    // u8g2.drawFrame(state->frame_position - 3, ICON_Y - ICON_HEIGHT - 3, ICON_WIDTH + 6, ICON_WIDTH + 6);
+
     check_button_event();
 }
 
@@ -201,43 +219,48 @@ uint8_t towards_int16(int16_t *current, int16_t dest)
     return 0;
 }
 
+// new towards function
 uint8_t towards(struct menu_state *current, struct menu_state *destination)
 {
     uint8_t r = 0;
-    uint8_t i;
-    for (i = 0; i < 6; i++)
-    {
-        r |= towards_int16(&(current->frame_position), destination->frame_position);
-        r |= towards_int16(&(current->menu_start), destination->menu_start);
-    }
+    r |= towards_int16(&(current->frame_position), destination->frame_position);
+    r |= towards_int16(&(current->frame_position), destination->frame_position);
+    r |= towards_int16(&(current->menu_start), destination->menu_start);
+    r |= towards_int16(&(current->menu_start), destination->menu_start);
     return r;
 }
 
+// new run_menu
 void run_menu()
 {
     do
     {
-        u8g2.firstPage();
-        do
+        u8g2.clearBuffer();
+        draw_main(&current_state);
+
+        if (destination_state.position != 0)
         {
-            draw(&current_state);
-            if (destination_state.position != 0)
-            {
-                u8g2.setFont(u8g2_font_open_iconic_arrow_2x_t);
-                u8g2.drawGlyph(0, u8g2.getDisplayHeight(), 65); // left arrow
-            }
-            u8g2.setFont(u8g2_font_helvB10_te);
-            u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth(menu_entry_list[destination_state.position].name)) / 2, u8g2.getDisplayHeight() - 5);
-            u8g2.print(menu_entry_list[destination_state.position].name);
-            if (destination_state.position != (Elements - 2))
-            {
-                u8g2.setFont(u8g2_font_open_iconic_arrow_2x_t);
-                u8g2.drawGlyph(u8g2.getDisplayWidth() - 16, u8g2.getDisplayHeight(), 66); // right arrow
-            }
-            check_button_event();
-            delay(10);
-        } while (u8g2.nextPage());
+            u8g2.setFont(u8g2_font_open_iconic_arrow_2x_t);
+            u8g2.drawGlyph(0, u8g2.getDisplayHeight(), 65); // left arrow
+        }
+
+        // u8g2.setFont(u8g2_font_unifont_te);
+        u8g2.setFont(u8g2_font_helvR12_te);
+        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth(menu_entry_list[destination_state.position].name)) / 2, u8g2.getDisplayHeight() - 5);
+        u8g2.print(menu_entry_list[destination_state.position].name);
+
+        if (destination_state.position != (ELEMENTS - 2))
+        {
+            u8g2.setFont(u8g2_font_open_iconic_arrow_2x_t);
+            u8g2.drawGlyph(u8g2.getDisplayWidth() - 16, u8g2.getDisplayHeight(), 66); // right arrow
+        }
+
+        u8g2.sendBuffer();
+
+        check_button_event();
+
         navigate_menu();
+
     } while (towards(&current_state, &destination_state));
 }
 
@@ -256,50 +279,167 @@ void navigate_menu()
         button_event = 0;
 }
 
+// new run_submenu
 void run_submenu()
 {
-    u8g2.firstPage();
-    do
+    int y_start = 10;
+    int y_gap = 18;
+    int x_gap = 0;
+
+    double O2_fraction = 20.004532;
+    double He_fraction = 35.004532;
+    double H2O_fraction = 2.56;
+
+    double temperature = 24.55532;
+    double relative_humidity = 35.004532;
+    double local_pressure = 15.5431236;
+
+    double duration = 467.004532;
+    double O2_millivolts = 10.12532;
+
+    u8g2.clearBuffer();
+
+    u8g2.setFont(u8g2_font_helvR08_te);
+
+    u8g2.drawStr(0, y_start, menu_entry_list[destination_state.position].name);
+
+    u8g2.drawHLine(0, y_start + 3, u8g2.getDisplayWidth());
+
+    // u8g2.drawStr((u8g2.getDisplayWidth() - u8g2.getStrWidth("main menu")) / 2, u8g2.getDisplayHeight(), "main menu");
+
+    switch (destination_state.position)
     {
-        u8g2.setFont(u8g2_font_unifont_te);
-        u8g2.drawStr(0, 8, menu_entry_list[destination_state.position].name);
+    case 0: // Nitrox
+        u8g2.setFont(u8g2_font_helvR08_te);
 
-        switch (destination_state.position)
-        {
-        case 0: // Nitrox
-            u8g2.drawUTF8(0, 12 * 3, "   O₂: 12.2 %");
-            u8g2.drawUTF8(0, 12 * 4, "       24.7 mV");
-            u8g2.drawUTF8(0, 12 * 5, "  H₂O: 51.1 %");
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 00.0%"), y_start);
+        u8g2.print("H₂O ");
+        u8g2.print(H2O_fraction);
+        u8g2.print("%");
 
-            break;
-        case 1: // Trimix
-            u8g2.drawUTF8(0, 12 * 3, "   O₂: 12.2 %");
-            u8g2.drawUTF8(0, 12 * 4, "   He: 24.7 %");
-            u8g2.drawUTF8(0, 12 * 5, "  H₂O: 51.1 %");
-            break;
-        case 2: // Calibrate
+        u8g2.setFont(u8g2_font_helvR12_tr);
+        x_gap = (u8g2.getDisplayWidth() - u8g2.getStrWidth("Oxygen")) / 2;
+        u8g2.drawUTF8(x_gap, 18 + y_start, "Oxygen");
+        u8g2.drawHLine(x_gap - 1, 18 + y_start + 2, u8g2.getStrWidth("Oxygen") + 1);
 
+        u8g2.setFont(u8g2_font_helvR24_te);
 
+        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("00.00%")) / 2, u8g2.getDisplayHeight() - 4);
+        u8g2.print(O2_fraction, 2);
+        u8g2.print("%");
 
-            break;            
-        case 3: // Environment
-            u8g2.drawUTF8(0, 12 * 3, " Temp: 21.7°C");
-            u8g2.drawUTF8(0, 12 * 4, "R.Hum: 51.1 %");
-            u8g2.drawUTF8(0, 12 * 5, "Press: 10.1 hPa");
-            break;
-        case 4: // Raw Data
-            u8g2.drawUTF8(0, 11 * 1, "   O₂: 12.2 mV");
-            u8g2.drawUTF8(0, 12 * 2, "  Dur: 24.7 µs");
-            u8g2.drawUTF8(0, 12 * 3, " Temp: 21.7°C");
-            u8g2.drawUTF8(0, 12 * 4, "R.Hum: 51.1 %");
-            u8g2.drawUTF8(0, 12 * 5, "Press: 10.1 hPa");
-            break;
-        }
+        break;
+    case 1: // Trimix
+        u8g2.setFont(u8g2_font_helvR08_te);
 
-        // case statement incorporate "draw" functions
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O : 00.0%"), y_start);
+        u8g2.print("H₂O ");
+        u8g2.print(H2O_fraction);
+        u8g2.print("%");
 
-        check_button_event();
-    } while (u8g2.nextPage());
+        u8g2.setFont(u8g2_font_helvR18_te);
+
+        y_gap = 26;
+        x_gap = 46;
+
+        u8g2.setCursor(0, y_gap * 1 + y_start);
+        u8g2.print("O₂");
+        u8g2.setCursor(x_gap, y_gap * 1 + y_start);
+        u8g2.print(O2_fraction, 2);
+        u8g2.print("%");
+
+        u8g2.setCursor(0, y_gap * 2 + y_start);
+        u8g2.print("He");
+        u8g2.setCursor(x_gap, y_gap * 2 + y_start);
+        u8g2.print(He_fraction, 2);
+        u8g2.print("%");
+
+        break;
+    case 2: // Calibrate
+        u8g2.setFont(u8g2_font_helvR12_te);
+
+        y_gap = 18;
+
+        break;
+    case 3: // Environment
+        u8g2.setFont(u8g2_font_helvR12_te);
+
+        y_gap = 18;
+        x_gap = 60;
+
+        u8g2.setCursor(0, y_gap * 1 + y_start);
+        u8g2.print("Temp");
+        u8g2.setCursor(x_gap, y_gap * 1 + y_start);
+        u8g2.print(temperature, 1);
+        u8g2.print("°C");
+
+        u8g2.setCursor(0, y_gap * 2 + y_start);
+        u8g2.print("R.Hum");
+        u8g2.setCursor(x_gap, y_gap * 2 + y_start);
+        u8g2.print(relative_humidity, 1);
+        u8g2.print("%");
+
+        u8g2.setCursor(0, y_gap * 3 + y_start);
+        u8g2.print("Press");
+        u8g2.setCursor(x_gap, y_gap * 3 + y_start);
+        u8g2.print(local_pressure, 1);
+        u8g2.print(" hPa");
+
+        // u8g2.drawUTF8(0, y_gap * 1 + y_start, "Temp: 21.7°C");
+        // u8g2.drawUTF8(0, y_gap * 2 + y_start, "R.Hum: 51.1%");
+        // u8g2.drawUTF8(0, y_gap * 3 + y_start, "Press: 10.1 hPa");
+
+        break;
+    case 4: // Raw Data
+        u8g2.setFont(u8g2_font_helvR08_te);
+
+        y_gap = 16;
+
+        u8g2.drawVLine(u8g2.getDisplayWidth() / 2 - 2, y_start + 3, y_gap * 2);
+
+        // u8g2.drawUTF8(0, y_gap * 1 + y_start, "O₂ : 12.2 mV");
+        u8g2.setCursor(0, y_gap * 1 + y_start);
+        u8g2.print("O₂ : ");
+        u8g2.print(O2_millivolts, 1);
+        u8g2.print(" mV");
+
+        // u8g2.drawUTF8(u8g2.getDisplayWidth() / 2 + 2, y_gap * 1 + y_start, "Dur: 24.7 µs");
+        u8g2.setCursor(u8g2.getDisplayWidth() / 2 + 2, y_gap * 1 + y_start);
+        u8g2.print("Dur: ");
+        u8g2.print(duration, 1);
+        u8g2.print(" µs");
+
+        u8g2.drawHLine(0, y_gap * 1 + y_start + 4, u8g2.getDisplayWidth());
+
+        // u8g2.drawUTF8(0, y_gap * 2 + y_start, "T: 21.7°C");
+        u8g2.setCursor(0, y_gap * 2 + y_start);
+        u8g2.print("T: ");
+        u8g2.print(temperature, 1);
+        u8g2.print("°C");
+
+        // u8g2.drawUTF8(u8g2.getDisplayWidth() / 2 + 4, y_gap * 2 + y_start, "RH: 51.1%");
+        u8g2.setCursor(0, y_gap * 2 + y_start);
+        u8g2.print("R.Hum");
+        u8g2.setCursor(x_gap, y_gap * 2 + y_start);
+        u8g2.print(relative_humidity, 1);
+        u8g2.print("%");
+
+        u8g2.drawHLine(0, y_gap * 2 + y_start + 2, u8g2.getDisplayWidth());
+
+        // u8g2.drawUTF8(0, y_gap * 3 + y_start, "Atm Press: 10.1 hPa");
+        u8g2.setCursor(0, y_gap * 3 + y_start);
+        u8g2.print("Press: ");
+        u8g2.print(local_pressure, 1);
+        u8g2.print(" hPa");
+
+        u8g2.drawHLine(0, y_gap * 3 + y_start + 4, u8g2.getDisplayWidth());
+
+        break;
+    }
+
+    u8g2.sendBuffer();
+
+    check_button_event();
 }
 
 void navigate_submenu()
