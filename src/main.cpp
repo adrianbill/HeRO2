@@ -1,12 +1,15 @@
 // Lbraries
-#include <Arduino.h>          // Basic Library
-#include <math.h>             // Math Library
-#include <Wire.h>             // I2C Library
-#include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
-#include <Adafruit_GFX.h>     // Graphic Library
-#include <Adafruit_SSD1306.h> // Display Library
-#include <ADS1X15.h>          // ADC / Amplifier Library
-#include <RunningAverage.h>   // Running Average Library
+#include <Arduino.h>        // Basic Library
+#include <math.h>           // Math Library
+#include <Wire.h>           // I2C Library
+// #include <Adafruit_HTU21DF.h> // Temp/Hum sensor Library
+// #include <Adafruit_GFX.h>     // Graphic Library
+// #include <Adafruit_SSD1306.h> // Display Library
+#include <U8g2lib.h>        // Display Library
+#include <MUIU8g2.h>        // Menu LIbrary
+#include <BME280I2C.h>      // Temp/Hum/Pres sensor Library
+#include <ADS1X15.h>        // ADC / Amplifier Library
+#include <RunningAverage.h> // Running Average Library
 
 // Custom Headers
 #include "constants.h"      // Global Constants
@@ -34,10 +37,7 @@
     // Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Oxygen Analysis setup
-double O2_calibration = 0; // Calibration value (%/mV)
-double O2_cal_target = 0.209;
-
-
+ // Calibration value (%/mV)
 
 void setup()
 {
@@ -61,25 +61,25 @@ void setup()
     // Oxygen sensor Initialise
     O2_Initialise();
 
-    // Ultrasonic initialise
-    ultrasonic_Initialise();
+    // // Ultrasonic initialise
+    // ultrasonic_Initialise();
 
-    // helium initialization
-    He_Initialise();
+    // // helium initialization
+    // He_Initialise();
 
-    O2_calibration = calibrate_oxygen(O2_cal_target);
+
 }
 
 void loop()
 {
-    main_menu_navigation();
+    menu_system();
     
 
     // double temperature = temperature_measurement(); // Kelvin
     // double humidity = humidity_measurement(); // % relative humidity
     // double pressure = atmpressure_measurement(); // kiloPascal
 
-    // double x_O2 = oxygen_measurement(O2_calibration);
+
     // double x_H2O = water_measurement(temperature, humidity, pressure);
 
     // double speed_of_sound = speed_measurement(); // Speed of sound in m/s
