@@ -16,7 +16,7 @@ RunningAverage RA_humidity(10);
 RunningAverage RA_pressure(10);
 
 // Initialize HTU21D sensor and clear running averages
-void Environment_Initialise()
+int Environment_Initialise()
 {
     if (!bme.begin())
     {
@@ -28,6 +28,7 @@ void Environment_Initialise()
     RA_temperature.clear();
     RA_humidity.clear();
     RA_pressure.clear();
+        return 1;
 }
 
 // Temperature Measurement Function in Kelvin

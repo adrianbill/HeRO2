@@ -4,6 +4,6 @@
 double measure_duration();
 double calibrate_distance(int, double, double);
 double speed_measurement();
-void ultrasonic_Initialise();
+int ultrasonic_Initialise();
 
 #endif

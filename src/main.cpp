@@ -65,8 +65,7 @@ View current_view = MAIN_MENU;
 uint8_t is_redraw = 1;
 
 // Functions
-void menu_system();
-void menu_initialise();
+int menu_initialise();
 void check_button_event();
 void draw_main(struct menu_state *state);
 void to_right(struct menu_state *state);
@@ -137,19 +136,41 @@ void setup()
     Wire.begin();
 
     // buttons and display Initialise
-    menu_initialise();
+
+    if (menu_initialise())
+    {
+        Serial.println("Display Connected");
+        Serial.println("Menu Initialised");
+        delay(1000);
+    }
 
     // Temperature, Relative Humidity, and pressure Sensor Initialise
-    Environment_Initialise();
+    if (Environment_Initialise())
+    {
+        Serial.println("Environment Connected");
+        delay(1000);
+    }
 
     // Oxygen sensor Initialise
-    O2_Initialise();
+    if (O2_Initialise())
+    {
+        Serial.println("ADC Connected");
+        delay(1000);
+    }
 
     // // Ultrasonic initialise
-    ultrasonic_Initialise();
+    if (ultrasonic_Initialise())
+    {
+        Serial.println("Ultrasonic Connected");
+        delay(1000);
+    }
 
     // // helium initialization
     He_Initialise();
+
+    calibrate_run_display();
+
+    run_menu();
 }
 
 void loop()
@@ -223,18 +244,22 @@ void loop()
 
 // Functions
 
-void menu_initialise()
+int menu_initialise()
 {
-    u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN);
+    if (u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN))
+    {
+        Serial.println("Failed to initialize display.");
+        while (1)
+            ;
+    }
+
     u8g2.enableUTF8Print();
     // u8g2.setFont(u8g2_font_unifont_te);
     u8g2.setFont(u8g2_font_helvR10_te);
 
     mui.begin(u8g2, fds_data, muif_list, sizeof(muif_list) / sizeof(muif_t));
 
-    calibrate_run_display();
-
-    run_menu();
+        return 1;
 }
 
 void check_button_event()

@@ -10,20 +10,21 @@
 #include "ultrasonic.h"
 
 // Ultrasonic Sensor Setup
-const int trigPin = 27; // Single Trigger pin for both ultrasonic sensors
-const int echoPin = 26; // Echo pin for each utrasonic sensors
+const int trigPin = 19; // Single Trigger pin for both ultrasonic sensors
+const int echoPin = 18; // Echo pin for each utrasonic sensors
 
 // Running Average Setup
 RunningAverage RA_dur(10);
 
 // Initialise ultrasonic sensor & running average
-void ultrasonic_Initialise()
+int ultrasonic_Initialise()
 {
     // establish pins
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
 
     RA_dur.clear();
+        return 1;
 }
 
 // Function to measure the sound travel time in seconds one way
