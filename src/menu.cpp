@@ -1,18 +1,22 @@
-// Libraries
-#include <Arduino.h>
-#include <U8g2lib.h>
-#include <MUIU8g2.h>
-#include <Wire.h>
+// Lbraries
+#include <Arduino.h>        // Basic Library
+#include <math.h>           // Math Library
+#include <Wire.h>           // I2C Library
+#include <U8g2lib.h>        // Display Library
+#include <MUIU8g2.h>        // Menu LIbrary
+#include <BME280I2C.h>      // Temp/Hum/Pres sensor Library
+#include <ADS1X15.h>        // ADC / Amplifier Library
+#include <RunningAverage.h> // Running Average Library
+
 
 // Custom Headers
-#include "oxygen.h"
-#include "ultrasonic.h"
-#include "environment.h"
+#include "constants.h"      // Global Constants
+#include "oxygen.h"         // oxygen calculations
+#include "environment.h"    // environmenttal parameters: temperature, humidity, atmospheric pressure
+#include "ultrasonic.h"     // ultrasonic measurement
 #include "speed_of_sound.h" // speed of sound calculations
 #include "helium.h"         // helium calculations
 
-// Paired Header
-#include "menu.h"
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 MUIU8G2 mui;
@@ -34,6 +38,12 @@ struct menu_state
     uint8_t position;       /* position, array index */
 };
 
+enum View
+{
+    MAIN_MENU,
+    SUB_MENU
+};
+
 // Icon configuration
 #define ICON_WIDTH 40
 #define ICON_HEIGHT 38
@@ -50,6 +60,27 @@ struct menu_state
 #define PREV_PIN 27
 
 int exit_code = 0;
+struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
+struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
+int8_t button_event = 0; // set this to 0, once the event has been processed
+View current_view = MAIN_MENU;
+uint8_t is_redraw = 1;
+
+// Functions
+void menu_system();
+void menu_initialise();
+void check_button_event();
+void draw_main(struct menu_state *state);
+void to_right(struct menu_state *state);
+void to_left(struct menu_state *state);
+uint8_t towards_int16(int16_t *current, int16_t dest);
+uint8_t towards(struct menu_state *current, struct menu_state *destination);
+void run_menu();
+void navigate_menu();
+void run_submenu();
+void navigate_submenu();
+void calibrate_run_display();
+
 
 // Main Menu items
 // {font, icon character 1, icon character 2, Title} second icon character used for O2 & He lemements
@@ -62,8 +93,8 @@ struct menu_entry_type menu_entry_list[ELEMENTS] =
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
         {NULL, 0, 0, NULL}};
 
-// mui Menu elements
 
+// mui Menu elements
 uint8_t calibration_target_ten = 2;
 uint8_t calibration_target_one = 0;
 uint8_t calibration_target_dec = 9;
@@ -86,51 +117,49 @@ muif_t muif_list[] = {
 fds_t fds_data[] =
 
     MUI_FORM(1)
-        MUI_STYLE(0)
-            MUI_LABEL(0, 34, "Target")
-                MUI_XY("CA", 65, 34)
-                    MUI_XY("CB", 75, 34)
-                        MUI_LABEL(85, 34, ".")
-                            MUI_XY("CC", 95, 34)
-                                MUI_LABEL(105, 34, " %")
-                                    MUI_STYLE(1)
-                                        MUI_XYAT("EX", 64, 58, 1, " SET ")
+    MUI_STYLE(0)
+    MUI_LABEL(0, 34, "Target")
+    MUI_XY("CA", 65, 34)
+    MUI_XY("CB", 75, 34)
+    MUI_LABEL(85, 34, ".")
+    MUI_XY("CC", 95, 34)
+    MUI_LABEL(105, 34, " %")
+    MUI_STYLE(1)
+    MUI_XYAT("EX", 64, 58, 1, " SET ")
 
     ;
 
 // END mui Menu elements
 
-int8_t button_event = 0; // set this to 0, once the event has been processed
 
-struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
-struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
-
-enum View
+void setup()
 {
-    MAIN_MENU,
-    SUB_MENU
-};
+    // start serial connection
+    Serial.begin(115200);
+    delay(1000); // Delay to stabilize serial communication
 
-View current_view = MAIN_MENU;
+    // Initialise I2C
+    Wire.begin();
 
-uint8_t is_redraw = 1;
+    // buttons and display Initialise
+    menu_initialise();
+    
+    // Temperature, Relative Humidity, and pressure Sensor Initialise
+    Environment_Initialise();
+    
+    // Oxygen sensor Initialise
+    O2_Initialise();
 
-// Functions
-void menu_system();
-void menu_initialise();
-void check_button_event();
-void draw_main(struct menu_state *state);
-void to_right(struct menu_state *state);
-void to_left(struct menu_state *state);
-uint8_t towards_int16(int16_t *current, int16_t dest);
-uint8_t towards(struct menu_state *current, struct menu_state *destination);
-void run_menu();
-void navigate_menu();
-void run_submenu();
-void navigate_submenu();
-void calibrate_run_display();
+    // // Ultrasonic initialise
+    ultrasonic_Initialise();
 
-void menu_system()
+    // // helium initialization
+    He_Initialise();
+
+}
+
+
+void loop()
 {
     check_button_event();
 
