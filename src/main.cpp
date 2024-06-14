@@ -77,15 +77,17 @@ void navigate_menu();
 void run_submenu();
 void navigate_submenu();
 void calibrate_run_display();
+void splash_screen();
+void splash_screen_cal();
 
 // Main Menu items
-// {font, icon character 1, icon character 2, Title} second icon character used for O2 & He lemements
+// {font, icon character 1, icon character 2, Title} second icon character used for O2 & He elements
 struct menu_entry_type menu_entry_list[ELEMENTS] =
     {
         {u8g2_font_helvR24_te, 79, 8322, "Oxygen"}, // 79 = "O", 8322 = "₂"
         {u8g2_font_helvR24_te, 72, 101, "Trimix"},  // 72 = "H", 101 = "e"
         {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Climate"},
-        {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibration"},
+        {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibrate"},
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
         {NULL, 0, 0, NULL}};
 
@@ -93,7 +95,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] =
 uint8_t calibration_target_ten = 2;
 uint8_t calibration_target_one = 0;
 uint8_t calibration_target_dec = 9;
-double O2_cal_target = 20.9;
+double O2_cal_target = 0.209;
 double O2_calibration = 0;
 
 muif_t muif_list[] = {
@@ -140,35 +142,35 @@ void setup()
     if (menu_initialise())
     {
         Serial.println("Display Connected");
-        Serial.println("Menu Initialised");
-        delay(1000);
+        splash_screen();
+        delay(500);
     }
 
     // Temperature, Relative Humidity, and pressure Sensor Initialise
     if (Environment_Initialise())
     {
         Serial.println("Environment Connected");
-        delay(1000);
+        delay(500);
     }
 
     // Oxygen sensor Initialise
     if (O2_Initialise())
     {
         Serial.println("ADC Connected");
-        delay(1000);
+        delay(500);
     }
 
     // // Ultrasonic initialise
     if (ultrasonic_Initialise())
     {
         Serial.println("Ultrasonic Connected");
-        delay(1000);
+        delay(500);
     }
 
     // // helium initialization
     He_Initialise();
 
-    calibrate_run_display();
+    splash_screen_cal();
 
     run_menu();
 }
@@ -184,9 +186,9 @@ void loop()
         {
             u8g2.clearBuffer();
 
-            u8g2.setFont(u8g2_font_helvB10_tr);
+            u8g2.setFont(u8g2_font_helvB10_te);
 
-            u8g2.drawStr(0, 12, menu_entry_list[destination_state.position].name);
+            u8g2.drawUTF8(0, 12, menu_entry_list[destination_state.position].name);
 
             u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
 
@@ -218,7 +220,7 @@ void loop()
     {
         if (exit_code == 1)
         {
-            O2_cal_target = (calibration_target_ten * 10) + (calibration_target_one) + (0.1 * calibration_target_dec);
+            O2_cal_target = (calibration_target_ten * 0.1) + (calibration_target_one * 0.01) + (calibration_target_dec * 0.001);
 
             calibrate_run_display();
 
@@ -246,7 +248,7 @@ void loop()
 
 int menu_initialise()
 {
-    if (u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN))
+    if (!u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN))
     {
         Serial.println("Failed to initialize display.");
         while (1)
@@ -254,12 +256,10 @@ int menu_initialise()
     }
 
     u8g2.enableUTF8Print();
-    // u8g2.setFont(u8g2_font_unifont_te);
-    u8g2.setFont(u8g2_font_helvR10_te);
 
     mui.begin(u8g2, fds_data, muif_list, sizeof(muif_list) / sizeof(muif_t));
 
-        return 1;
+    return 1;
 }
 
 void check_button_event()
@@ -410,7 +410,7 @@ void run_menu()
 
         // u8g2.setFont(u8g2_font_unifont_te);
         u8g2.setFont(u8g2_font_helvR12_te);
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth(menu_entry_list[destination_state.position].name)) / 2, u8g2.getDisplayHeight() - 5);
+        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width(menu_entry_list[destination_state.position].name)) / 2, u8g2.getDisplayHeight() - 5);
         u8g2.print(menu_entry_list[destination_state.position].name);
 
         if (destination_state.position != (ELEMENTS - 2))
@@ -446,6 +446,8 @@ void navigate_menu()
 // new run_submenu
 void run_submenu()
 {
+    check_button_event();
+
     int y_start = 10;
     int y_gap = 18;
     int x_gap = 0;
@@ -463,15 +465,17 @@ void run_submenu()
     double duration = 0.00;
     double O2_millivolts = 0.00;
 
+    check_button_event();
+
     u8g2.clearBuffer();
 
-    u8g2.setFont(u8g2_font_helvB10_tr);
+    u8g2.setFont(u8g2_font_helvB10_te);
 
-    u8g2.drawStr(0, y_start + 2, menu_entry_list[destination_state.position].name);
+    u8g2.drawUTF8(0, y_start + 2, menu_entry_list[destination_state.position].name);
 
     u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
-    // u8g2.drawStr((u8g2.getDisplayWidth() - u8g2.getStrWidth("main menu")) / 2, u8g2.getDisplayHeight(), "main menu");
+    // u8g2.UTF8((u8g2.getDisplayWidth() - u8g2.getStrWidth("main menu")) / 2, u8g2.getDisplayHeight(), "main menu");
 
     switch (destination_state.position)
     {
@@ -480,11 +484,13 @@ void run_submenu()
         O2_millivolts = oxygen_millivolts();
         H2O_fraction = water_measurement(temperature, relative_humidity, local_pressure);
 
+        check_button_event();
+
         u8g2.setFont(u8g2_font_helvR08_te);
 
-        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O 0.00 %"), y_start + 2);
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
         u8g2.print("H₂O ");
-        u8g2.print(H2O_fraction, 2);
+        u8g2.print(H2O_fraction * 100, 2);
         u8g2.print(" %");
 
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("Cell 00.00 mV")) / 2, u8g2.getDisplayHeight() - 4);
@@ -496,8 +502,16 @@ void run_submenu()
 
         u8g2.setFont(u8g2_font_helvR24_te);
 
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("100.0 %")) / 2 + 2, u8g2.getDisplayHeight() - 19);
-        u8g2.print(O2_fraction, 1);
+        if (O2_fraction < 1)
+        {
+            u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("00.0 %")) / 2 + 2, u8g2.getDisplayHeight() - 19);
+        }
+        else
+        {
+            u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("100.0 %")) / 2 + 2, u8g2.getDisplayHeight() - 19);
+        }
+
+        u8g2.print(O2_fraction * 100, 1);
         u8g2.print(" %");
 
         break;
@@ -507,11 +521,13 @@ void run_submenu()
         speed_of_sound = speed_measurement(); // Speed of sound in m/s
         He_fraction = helium_measurement(O2_fraction, H2O_fraction, speed_of_sound, temperature);
 
+        check_button_event();
+
         u8g2.setFont(u8g2_font_helvR08_te);
 
-        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O 0.00 %"), y_start + 2);
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
         u8g2.print("H₂O ");
-        u8g2.print(H2O_fraction, 2);
+        u8g2.print(H2O_fraction * 100, 2);
         u8g2.print(" %");
 
         u8g2.setFont(u8g2_font_helvR18_te);
@@ -521,20 +537,20 @@ void run_submenu()
         u8g2.setCursor(0, 38);
         u8g2.print("O₂");
         u8g2.setCursor(x_gap, 38);
-        u8g2.print(O2_fraction, 1);
+        u8g2.print(O2_fraction * 100, 1);
         u8g2.print(" %");
 
         u8g2.setCursor(0, u8g2.getDisplayHeight());
         u8g2.print("He");
         u8g2.setCursor(x_gap, u8g2.getDisplayHeight());
-        u8g2.print(He_fraction, 1);
+        u8g2.print(He_fraction * 100, 1);
         u8g2.print(" %");
 
         break;
     case 2: // Environment
         u8g2.setFont(u8g2_font_helvB12_te);
 
-        x_gap = 60;
+        x_gap = u8g2.getStrWidth("R.Hum") + 4;
 
         u8g2.setCursor(0, 31);
         u8g2.print("Temp");
@@ -545,7 +561,7 @@ void run_submenu()
         u8g2.setCursor(0, 47);
         u8g2.print("R.Hum");
         u8g2.setCursor(x_gap, 47);
-        u8g2.print(relative_humidity, 1);
+        u8g2.print(relative_humidity * 100, 1);
         u8g2.print(" %");
 
         u8g2.setCursor(0, u8g2.getDisplayHeight());
@@ -563,7 +579,10 @@ void run_submenu()
         break;
     case 4: // Raw Data
         O2_millivolts = oxygen_millivolts();
+
         duration = measure_duration() * 2000000;
+
+        check_button_event();
 
         u8g2.setFont(u8g2_font_helvR08_te);
 
@@ -590,7 +609,7 @@ void run_submenu()
 
         u8g2.setCursor(u8g2.getDisplayWidth() / 2 + 2, y_gap * 2 + y_start);
         u8g2.print("RH ");
-        u8g2.print(relative_humidity, 1);
+        u8g2.print(relative_humidity * 100, 1);
         u8g2.print(" %");
 
         u8g2.drawHLine(0, y_gap * 2 + y_start + 4, u8g2.getDisplayWidth());
@@ -627,17 +646,64 @@ void calibrate_run_display()
     u8g2.clearBuffer();
 
     u8g2.setFont(u8g2_font_helvB10_te);
-    u8g2.drawStr(0, 12, menu_entry_list[destination_state.position].name);
+    u8g2.drawUTF8(0, 12, menu_entry_list[3].name);
     u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
     u8g2.setCursor(0, 30);
     u8g2.print("Calibrating ...");
     u8g2.setCursor(0, 45);
     u8g2.print("O₂ Target ");
-    u8g2.print(O2_cal_target, 1);
+    u8g2.print(O2_cal_target * 100, 1);
     u8g2.print(" %");
     u8g2.sendBuffer();
 
     O2_calibration = calibrate_oxygen(O2_cal_target);
 
-    delay(3000);
+    delay(2000);
+}
+
+void splash_screen()
+{
+    int y_start = 34;
+
+    u8g2.setFont(u8g2_font_helvR24_te);
+
+    u8g2.clearBuffer();
+
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
+    u8g2.print("HeRO₂");
+
+    u8g2.setFont(u8g2_font_helvR10_te);
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
+    u8g2.print("gas analyser");
+
+    u8g2.setFont(u8g2_font_helvR08_te);
+    u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("by a. bill"), u8g2.getDisplayHeight() - 2);
+    u8g2.print("by a. bill");
+
+    u8g2.sendBuffer();
+    delay(2000);
+}
+
+void splash_screen_cal()
+{
+    int y_start = 34;
+
+    u8g2.setFont(u8g2_font_helvR24_te);
+
+    u8g2.clearBuffer();
+
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
+    u8g2.print("HeRO₂");
+
+    u8g2.setFont(u8g2_font_helvR10_te);
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
+    u8g2.print("gas analyser");
+
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating O₂ ...")) / 2, u8g2.getDisplayHeight() - 2);
+    u8g2.print("Calibrating O₂ ...");
+
+    u8g2.sendBuffer();
+
+    O2_calibration = calibrate_oxygen(O2_cal_target);
+    delay(2000);
 }

@@ -34,12 +34,13 @@ double helium_measurement(double x_O2, double x_H2O, double c_mea, double T)
         double N2_mod = x_N2 - x_He;
 
         // Ensure He fraction stays within valid range
-        if (N2_mod < 0)
-        {
-            x_He = x_N2; // Ensure the fraction does not go negative
-            break;
-        }
-        else if (x_He > max_He)
+        // if (N2_mod < 0)
+        // {
+        //     x_He = x_N2; // Ensure the fraction does not go negative
+        //     break;
+        // }
+        // else 
+        if (x_He > max_He)
         {
             x_He = max_He;
             break;

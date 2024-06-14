@@ -1,6 +1,6 @@
 // Libraries
-#include <Arduino.h>          // Basic Library
-#include <RunningAverage.h>   // Running Average Library
+#include <Arduino.h>        // Basic Library
+#include <RunningAverage.h> // Running Average Library
 
 // custom headers
 #include "speed_of_sound.h"
@@ -11,7 +11,7 @@
 
 // Ultrasonic Sensor Setup
 const int trigPin = 19; // Single Trigger pin for both ultrasonic sensors
-const int echoPin = 18; // Echo pin for each utrasonic sensors
+const int echoPin = 18; // Echo pin for each ultrasonic sensors
 
 // Running Average Setup
 RunningAverage RA_dur(10);
@@ -24,7 +24,14 @@ int ultrasonic_Initialise()
     pinMode(echoPin, INPUT);
 
     RA_dur.clear();
-        return 1;
+
+    // if (!measure_duration())
+    // {
+    //     Serial.println("Failed to measure speed.");
+    //     while (1)
+    //         ;
+    // }
+    return 1;
 }
 
 // Function to measure the sound travel time in seconds one way
@@ -33,6 +40,7 @@ double measure_duration()
     // Clear the trigger pin
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
+
 
     // Send a 10 microsecond pulse to trigger the sensor
     digitalWrite(trigPin, HIGH);
@@ -44,6 +52,7 @@ double measure_duration()
 
     return RA_dur.getAverage() / 2000000;
 }
+
 
 // speed of sound measurement
 double speed_measurement()
