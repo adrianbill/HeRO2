@@ -3,6 +3,7 @@
 
 double calibrate_oxygen(double);
 double oxygen_measurement(double);
+double oxygen_millivolts();
 void O2_Initialise();
 
 #endif

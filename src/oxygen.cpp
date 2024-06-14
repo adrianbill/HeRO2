@@ -12,7 +12,7 @@ ADS1115 ads(0x48);
 
 // O2 running average setup
 RunningAverage RA_O2_measure(20);
-RunningAverage RA_O2_calibration(20);
+RunningAverage RA_O2_calibration(50);
 
 // Initialiases Analog to Digital Converter for O2 Sensor and clear running average
 void O2_Initialise()
@@ -35,7 +35,7 @@ double calibrate_oxygen(double target_O2)
 
     RA_O2_calibration.clear();
 
-    int calCount = 50; // Calibration samples
+    int calCount = 200; // Calibration samples
 
     for (int i = 0; i <= calCount; i++)
     {
@@ -74,8 +74,19 @@ double oxygen_measurement(double O2_cal_factor)
     Serial.print("  ||  O₂: ");
     Serial.print(voltage_meas * O2_cal_factor, 2);
     Serial.print("% ±");
-    Serial.print(ads.toVoltage(RA_O2_measure.getStandardDeviation()) * 1000, 2);
+    Serial.print(ads.toVoltage(RA_O2_measure.getStandardDeviation()) * 1000 * O2_cal_factor, 2);
     Serial.println("%");
 
     return voltage_meas * O2_cal_factor; // Convert mV ADC reading to % O2
+}
+
+// Function to return O2 millivolts
+double oxygen_millivolts()
+{
+    int16_t reading = ads.readADC_Differential_0_1();
+
+    RA_O2_measure.addValue(reading);
+
+    return ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
+    ;
 }

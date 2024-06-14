@@ -124,7 +124,7 @@ void run_menu();
 void navigate_menu();
 void run_submenu();
 void navigate_submenu();
-void calibration();
+void calibrate_run_display();
 
 void menu_system()
 {
@@ -171,10 +171,12 @@ void menu_system()
     {
         if (exit_code == 1)
         {
-            O2_cal_target = calibration_target_ten * 10 + calibration_target_one + calibration_target_dec / 10;
-            calibrate_oxygen(O2_cal_target);
-            exit_code = 0;
+            O2_cal_target = (calibration_target_ten * 10) + (calibration_target_one) + (0.1 * calibration_target_dec);
+
+            calibrate_run_display();
+
             current_view = MAIN_MENU;
+            exit_code = 0;
             button_event = 0;
         }
 
@@ -204,13 +206,7 @@ void menu_initialise()
 
     mui.begin(u8g2, fds_data, muif_list, sizeof(muif_list) / sizeof(muif_t));
 
-    u8g2.clearBuffer();
-
-    u8g2.setCursor(0, 40);
-    u8g2.print("Calibrating ...");
-    u8g2.sendBuffer();
-
-    O2_calibration = calibrate_oxygen(O2_cal_target);
+    calibrate_run_display();
 
     run_menu();
 }
@@ -427,7 +423,8 @@ void run_submenu()
     switch (destination_state.position)
     {
     case 0: // Oxygen
-        H2O_fraction = oxygen_measurement(O2_calibration);
+        O2_fraction = oxygen_measurement(O2_calibration);
+        O2_millivolts = oxygen_millivolts();
 
         u8g2.setFont(u8g2_font_helvR08_te);
 
@@ -440,7 +437,7 @@ void run_submenu()
         u8g2.print("Cell ");
         u8g2.print(O2_millivolts, 1);
         u8g2.print(" mV");
-        // u8g2.print("  ");
+        // u8g2.print(" | ");
         // u8g2.print(O2_cal_target, 1);
 
         u8g2.setFont(u8g2_font_helvR24_te);
@@ -459,6 +456,8 @@ void run_submenu()
 
         break;
     case 1: // Trimix
+        O2_fraction = oxygen_measurement(O2_calibration);
+
         u8g2.setFont(u8g2_font_helvR08_te);
 
         u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("H₂O 0.00 %"), y_start + 2);
@@ -521,6 +520,8 @@ void run_submenu()
 
         break;
     case 4: // Raw Data
+        O2_millivolts = O2_millivolts = oxygen_millivolts();
+
         u8g2.setFont(u8g2_font_helvR08_te);
 
         y_gap = 16;
@@ -529,7 +530,7 @@ void run_submenu()
 
         u8g2.setCursor(0, y_gap * 1 + y_start);
         u8g2.print("O₂ ");
-        u8g2.print(O2_millivolts, 1);
+        u8g2.print(O2_millivolts, 2);
         u8g2.print(" mV");
 
         u8g2.setCursor(u8g2.getDisplayWidth() / 2 + 2, y_gap * 1 + y_start);
@@ -576,4 +577,24 @@ void navigate_submenu()
     {
         button_event = 0;
     }
+}
+
+void calibrate_run_display()
+{
+    u8g2.clearBuffer();
+
+    u8g2.setFont(u8g2_font_helvB10_te);
+    u8g2.drawStr(0, 12, menu_entry_list[destination_state.position].name);
+    u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
+    u8g2.setCursor(0, 30);
+    u8g2.print("Calibrating ...");
+    u8g2.setCursor(0, 45);
+    u8g2.print("O₂ Target ");
+    u8g2.print(O2_cal_target, 1);
+    u8g2.print(" %");
+    u8g2.sendBuffer();
+
+    O2_calibration = calibrate_oxygen(O2_cal_target);
+
+    delay(3000);
 }

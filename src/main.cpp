@@ -56,7 +56,7 @@ void setup()
     menu_initialise();
     
     // Temperature, Relative Humidity, and pressure Sensor Initialise
-    Environment_Initialise();
+    // Environment_Initialise();
     
     // Oxygen sensor Initialise
     O2_Initialise();
