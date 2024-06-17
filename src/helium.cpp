@@ -19,44 +19,68 @@ void He_Initialise()
     RA_He.clear();
 }
 
+// Function to calculate the molar mass of the mixture
+double calculate_molar_mass(double x_He, double x_O2, double x_N2, double x_H2O)
+{
+    return x_He * M_He + x_O2 * M_O2 + x_N2 * M_N2 + x_H2O * M_H2O;
+}
+
+// Function to calculate the effective adiabatic index (G_i=(gamma_i−1)^-1
+double calculate_effective_gamma(double x_He, double x_O2, double x_N2, double x_H2O)
+{
+    double G_He = 1 / (gamma_He - 1);
+    double G_O2 = 1 / (gamma_O2 - 1);
+    double G_N2 = 1 / (gamma_N2 - 1);
+    double G_H2O = 1 / (gamma_H2O - 1);
+    double G_mix = x_He * G_He + x_O2 * G_O2 + x_N2 * G_N2 + x_H2O * G_H2O;
+    return (1 / G_mix) + 1;
+}
+
+// Function to calculate the speed of sound
+double calculate_speed_of_sound(double gamma_mix, double M_mix, double T)
+{
+    return sqrt(gamma_mix * R * T / M_mix);
+}
+
+
 // function to trigger helium reading
-double helium_measurement(double x_O2, double x_H2O, double c_mea, double T)
+double helium_measurement(double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature)
 {
 
-    double x_N2 = 1.0 - x_O2 - x_H2O; // Assume N2 makes up the rest
-    double x_He = 0.0;
-    double max_He = 1 - x_O2 - x_H2O;
+    double N2_fraction = 1.0 - O2_fraction - H2O_fraction; // Assume N2 makes up the rest
+    double He_fraction = 0.0;
+    double maHe_fraction = 1 - O2_fraction - H2O_fraction;
 
     // Iterate to solve for He fraction
 
     for (int i = 0; i < 1000; i++)
     {
-        double N2_mod = x_N2 - x_He;
+        double N2_modified = N2_fraction - He_fraction;
 
         // Ensure He fraction stays within valid range
-        // if (N2_mod < 0)
+        // if (N2_modified < 0)
         // {
-        //     x_He = x_N2; // Ensure the fraction does not go negative
+        //     He_fraction = N2_fraction; // Ensure the fraction does not go negative
         //     break;
         // }
-        // else 
-        if (x_He > max_He)
+        // else
+        if (He_fraction > maHe_fraction)
         {
-            x_He = max_He;
+            He_fraction = maHe_fraction;
             break;
         }
-        else if (x_He < 0)
+        else if (He_fraction < 0)
         {
-            x_He = 0;
+            He_fraction = 0;
             break;
         }
 
-        double M_mix = calculate_molar_mass(x_He, x_O2, N2_mod, x_H2O);
-        double gamma_mix = calculate_effective_gamma(x_He, x_O2, N2_mod, x_H2O);
+        double molar_mass_mix = calculate_molar_mass(He_fraction, O2_fraction, N2_modified, H2O_fraction);
+        double adiabatic_index_mix = calculate_effective_gamma(He_fraction, O2_fraction, N2_modified, H2O_fraction);
 
-        double c_calc = calculate_speed_of_sound(gamma_mix, M_mix, T);
+        double speed_of_sound_calculated = calculate_speed_of_sound(adiabatic_index_mix, molar_mass_mix, temperature);
 
-        double error = c_mea - c_calc;
+        double error = speed_of_sound_measured - speed_of_sound_calculated;
 
         if (abs(error) < 0.001)
         {
@@ -64,10 +88,71 @@ double helium_measurement(double x_O2, double x_H2O, double c_mea, double T)
         }
 
         // Adjust He fraction for next iteration
-        x_He += 0.0001 * error; // Simple proportional adjustment
+        He_fraction += 0.0001 * error; // Simple proportional adjustment
 
-        x_N2 = 1.0 - x_He - x_O2 - x_H2O;
+        N2_fraction = 1.0 - He_fraction - O2_fraction - H2O_fraction;
     }
 
-    return x_He;
+    return He_fraction;
 }
+
+// //  New function to trigger helium reading under development
+// double helium_measurement(double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature)
+// {
+
+//     double N2_fraction = 1.0 - O2_fraction - H2O_fraction; // Assume N2 makes up the rest
+//     double He_fraction = 0.0;
+//     double maHe_fraction = 1 - O2_fraction - H2O_fraction;
+
+//     // Iterate to solve for He fraction
+
+//     do
+//     {
+        
+//         double molar_mass_mix = calculate_molar_mass(He_fraction, O2_fraction, N2_fraction, H2O_fraction);
+//         double adiabatic_index_mix = calculate_effective_gamma(He_fraction, O2_fraction, N2_fraction, H2O_fraction);
+//         double speed_of_sound_calculated = calculate_speed_of_sound(adiabatic_index_mix, molar_mass_mix, temperature);
+
+//         double error = speed_of_sound_measured - speed_of_sound_calculated;
+
+//     } while (abs(error) < 0.01);
+
+//     for (int i = 0; i < 1000; i++)
+//     {
+//         double N2_modified = N2_fraction - He_fraction;
+
+//         // Ensure He fraction stays within valid range
+//         // if (N2_modified < 0)
+//         // {
+//         //     He_fraction = N2_fraction; // Ensure the fraction does not go negative
+//         //     break;
+//         // }
+//         // else
+//         if (He_fraction > maHe_fraction)
+//         {
+//             He_fraction = maHe_fraction;
+//             break;
+//         }
+//         else if (He_fraction < 0)
+//         {
+//             He_fraction = 0;
+//             break;
+//         }
+
+//         double speed_of_sound_calculated = calculate_speed_of_sound(adiabatic_index_mix, molar_mass_mix, temperature);
+
+//         double error = speed_of_sound_measured - speed_of_sound_calculated;
+
+//         if (abs(error) < 0.001)
+//         {
+//             break; // Converged to solution within tolerance
+//         }
+
+//         // Adjust He fraction for next iteration
+//         He_fraction += 0.0001 * error; // Simple proportional adjustment
+
+//         N2_fraction = 1.0 - He_fraction - O2_fraction - H2O_fraction;
+//     }
+
+//     return He_fraction;
+// }
