@@ -54,7 +54,7 @@ double calibrate_oxygen(double target_O2)
     // Serial.print(" ±");
     // Serial.print(RA_O2_calibration.getStandardDeviation(), 2);
     // Serial.println("mV");
-
+    Serial.println("O₂ Calibrated");
     return target_O2 / millivolts;
 }
 

@@ -3,19 +3,19 @@
 
 // define your own namespace to hold constants
       // Universal Gas constant, J/(mol.K)
-    extern constexpr double R{8.314462618};
+    extern constexpr double R_gas_constant{8.314462618};
 
     // Adiabatic Indices
-    extern constexpr double gamma_He{1.666};
-    extern constexpr double gamma_O2{1.394};
-    extern constexpr double gamma_N2{1.399};
-    extern constexpr double gamma_H2O{1.33};
+    extern constexpr double He_adiabatic_index{1.666};
+    extern constexpr double O2_adiabatic_index{1.394};
+    extern constexpr double N2_adiabatic_index{1.399};
+    extern constexpr double H2O_adiabatic_index{1.33};
 
     // Molar Masses, kg/mol
-    extern constexpr double M_He{0.00400};
-    extern constexpr double M_O2{0.03200};
-    extern constexpr double M_N2{0.02802};
-    extern constexpr double M_H2O{0.01802};
+    extern constexpr double He_molar_mass{0.00400};
+    extern constexpr double O2_molar_mass{0.03200};
+    extern constexpr double N2_molar_mass{0.02802};
+    extern constexpr double H2O_molar_mass{0.01802};
 
     // calibrated distance in m
-    extern constexpr double distance_calibrated{0.043856};
+    extern constexpr double distance_calibrated{0.04656};

@@ -28,7 +28,7 @@ int Environment_Initialise()
     RA_temperature.clear();
     RA_humidity.clear();
     RA_pressure.clear();
-        return 1;
+    return 1;
 }
 
 // Temperature Measurement Function in Kelvin
@@ -58,8 +58,8 @@ double atmpressure_measurement()
 // Function to calculate the fraction of water in gas using relative humidity
 double water_measurement(double temperature_K, double hum, double pressure_total)
 {
-    // calculate saturation vapour pressure of water kPa using Tetens equation 
-    double pressure_saturation = 0.61078 * exp((17.27 * (temperature_K - 273.15)) / ((temperature_K - 273.15) + 237.3)); 
+    // calculate saturation vapour pressure of water kPa using Tetens equation
+    double pressure_saturation = 0.61078 * exp((17.27 * (temperature_K - 273.15)) / ((temperature_K - 273.15) + 237.3));
     // calculate x_H20
-    return (pressure_saturation * hum) / pressure_total;                             
+    return (pressure_saturation * hum) / pressure_total;
 }

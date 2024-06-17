@@ -9,12 +9,11 @@
 #include <RunningAverage.h> // Running Average Library
 
 // Custom Headers
-#include "constants.h"      // Global Constants
-#include "oxygen.h"         // oxygen calculations
-#include "environment.h"    // environmenttal parameters: temperature, humidity, atmospheric pressure
-#include "ultrasonic.h"     // ultrasonic measurement
-#include "speed_of_sound.h" // speed of sound calculations
-#include "helium.h"         // helium calculations
+#include "constants.h"   // Global Constants
+#include "oxygen.h"      // oxygen calculations
+#include "environment.h" // environmenttal parameters: temperature, humidity, atmospheric pressure
+#include "ultrasonic.h"  // ultrasonic measurement
+#include "helium.h"      // helium calculations
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 MUIU8G2 mui;
@@ -63,6 +62,7 @@ struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
 int8_t button_event = 0; // set this to 0, once the event has been processed
 View current_view = MAIN_MENU;
 uint8_t is_redraw = 1;
+int helium_check = 0;
 
 // Functions
 int menu_initialise();
@@ -143,28 +143,28 @@ void setup()
     {
         Serial.println("Display Connected");
         splash_screen();
-        delay(500);
+        delay(100);
     }
 
     // Temperature, Relative Humidity, and pressure Sensor Initialise
     if (Environment_Initialise())
     {
         Serial.println("Environment Connected");
-        delay(500);
+        delay(100);
     }
 
     // Oxygen sensor Initialise
     if (O2_Initialise())
     {
         Serial.println("ADC Connected");
-        delay(500);
+        delay(100);
     }
 
     // // Ultrasonic initialise
     if (ultrasonic_Initialise())
     {
         Serial.println("Ultrasonic Connected");
-        delay(500);
+        delay(100);
     }
 
     // // helium initialization
@@ -452,18 +452,17 @@ void run_submenu()
     int y_gap = 18;
     int x_gap = 0;
 
-    double O2_fraction = 0.00;
-    double He_fraction = 0.00;
-    double H2O_fraction = 0.00;
-
     double temperature = temperature_measurement(); // Kelvin
     double relative_humidity = humidity_measurement();
     double local_pressure = atmpressure_measurement(); // kPa
 
-    double speed_of_sound = 0.00;
+    double O2_fraction;
+    double He_fraction;
+    double H2O_fraction;
 
-    double duration = 0.00;
-    double O2_millivolts = 0.00;
+    double speed_of_sound;
+    double duration;
+    double O2_millivolts;
 
     check_button_event();
 
@@ -481,7 +480,6 @@ void run_submenu()
     {
     case 0: // Oxygen
         O2_fraction = oxygen_measurement(O2_calibration);
-        O2_millivolts = oxygen_millivolts();
         H2O_fraction = water_measurement(temperature, relative_humidity, local_pressure);
 
         check_button_event();
@@ -516,10 +514,17 @@ void run_submenu()
 
         break;
     case 1: // Trimix
+        speed_of_sound = speed_measurement();
         O2_fraction = oxygen_measurement(O2_calibration);
         H2O_fraction = water_measurement(temperature, relative_humidity, local_pressure);
-        speed_of_sound = speed_measurement(); // Speed of sound in m/s
-        He_fraction = helium_measurement(O2_fraction, H2O_fraction, speed_of_sound, temperature);
+
+        if (helium_check == 0)
+        {
+            He_fraction = 0;
+            helium_check = 1;
+        }
+
+        He_fraction = helium_measurement(He_fraction, O2_fraction, H2O_fraction, speed_of_sound, temperature);
 
         check_button_event();
 
@@ -578,9 +583,9 @@ void run_submenu()
 
         break;
     case 4: // Raw Data
-        O2_millivolts = oxygen_millivolts();
 
-        duration = measure_duration() * 2000000;
+        duration = measure_duration() * 1000000;
+        O2_millivolts = oxygen_millivolts();
 
         check_button_event();
 
@@ -663,7 +668,7 @@ void calibrate_run_display()
 
 void splash_screen()
 {
-    int y_start = 34;
+    int y_start = 33;
 
     u8g2.setFont(u8g2_font_helvR24_te);
 
@@ -686,7 +691,9 @@ void splash_screen()
 
 void splash_screen_cal()
 {
-    int y_start = 34;
+    Serial.println("Calibrating O₂");
+
+    int y_start = 33;
 
     u8g2.setFont(u8g2_font_helvR24_te);
 
@@ -699,11 +706,10 @@ void splash_screen_cal()
     u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
     u8g2.print("gas analyser");
 
-    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating O₂ ...")) / 2, u8g2.getDisplayHeight() - 2);
-    u8g2.print("Calibrating O₂ ...");
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating O")) / 2, u8g2.getDisplayHeight() - 4);
+    u8g2.print("Calibrating O₂");
 
     u8g2.sendBuffer();
 
     O2_calibration = calibrate_oxygen(O2_cal_target);
-    delay(2000);
 }
