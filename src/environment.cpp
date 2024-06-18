@@ -64,6 +64,6 @@ double water_measurement()
     
     // calculate saturation vapour pressure of water kPa using Tetens equation
     double pressure_saturation = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3));
-    // calculate x_H20
-    return (pressure_saturation * humidity) / pressure_total;
+
+    return (pressure_saturation * humidity) / pressure_total; // calculate x_H20
 }

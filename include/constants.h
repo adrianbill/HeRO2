@@ -1,8 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// define your own namespace to hold constants
-
 // Universal Gas constant, J/(mol.K)
 extern const double R_gas_constant;
 

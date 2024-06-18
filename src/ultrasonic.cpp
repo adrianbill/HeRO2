@@ -54,10 +54,6 @@ double measure_duration()
 
     double duration0 = pulseIn(echoPin0, HIGH);
     RA_dur.addValue(duration0);
-    // Serial.print("Dur 1: ");
-    // Serial.print(duration0);
-
-    // delay(50);
 
     // Clear the trigger pin
     digitalWrite(trigPin, LOW);
@@ -70,8 +66,6 @@ double measure_duration()
 
     double duration1 = pulseIn(echoPin1, HIGH);
     RA_dur.addValue(duration1);
-    // Serial.print(" | Dur 2: ");
-    // Serial.println(duration1);
 
     return RA_dur.getAverage() / 1000000;
 }
@@ -91,19 +85,6 @@ void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fract
     double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
 
     double duration = measure_duration();
-
-    // // debugging
-    // double distance = speed_of_sound_calculated * duration;
-
-    // Serial.print("Speed Cal: ");
-    // Serial.print(speed_of_sound_calculated);
-
-    // Serial.print(" | Dur: ");
-    // Serial.print(duration * 1000000);
-    // Serial.print(" µs | Dist: ");
-    // Serial.print(distance * 1000);
-    // Serial.println(" mm");
-    // // end debugging
 
     distance_calibrated = speed_of_sound_calculated * duration;
 

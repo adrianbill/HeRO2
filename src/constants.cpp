@@ -1,7 +1,6 @@
 // Paired Header
 #include "constants.h"
 
-// define your own namespace to hold constants
 // Universal Gas constant, J/(mol.K)
 extern constexpr double R_gas_constant{8.314462618};
 

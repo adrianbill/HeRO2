@@ -125,7 +125,6 @@ muif_t muif_list[] = {
     MUIF_U8G2_U8_MIN_MAX("DB", &dist_calibration_target_one, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
     MUIF_U8G2_U8_MIN_MAX("DC", &dist_calibration_target_dec, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
 
-    /* a button for the menu... */
     MUIF_BUTTON("BO", mui_u8g2_btn_goto_wm_fi),
     MUIF_BUTTON("BH", mui_u8g2_btn_goto_wm_fi),
     MUIF_BUTTON("BA", mui_u8g2_btn_goto_wm_fi),
@@ -133,37 +132,36 @@ muif_t muif_list[] = {
 
 fds_t fds_data[] =
 
-    MUI_FORM(3)
+        MUI_FORM(3)
         MUI_STYLE(0)
-            MUI_XYAT("BO", 32, 34, 1, " O₂ ")
-                MUI_XYAT("BH", 96, 34, 2, " He ")
-                    MUI_STYLE(1)
-                        MUI_XYAT("EX", 64, 58, 3, " exit ")
+        MUI_XYAT("BO", 32, 34, 1, " O₂ ")
+        MUI_XYAT("BH", 96, 34, 2, " He ")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 64, 58, 3, " exit ")
 
-                            MUI_FORM(1)
-                                MUI_STYLE(0)
-                                    MUI_LABEL(0, 34, "O₂ ")
-                                        MUI_XY("CA", 65, 34)
-                                            MUI_XY("CB", 75, 34)
-                                                MUI_LABEL(85, 34, ".")
-                                                    MUI_XY("CC", 95, 34)
-                                                        MUI_LABEL(105, 34, " %")
-                                                            MUI_STYLE(1)
-                                                                MUI_XYAT("EX", 32, 58, 1, " cal ")
-                                                                    MUI_XYAT("BA", 96, 58, 3, " back ")
+        MUI_FORM(1)
+        MUI_STYLE(0)
+        MUI_LABEL(0, 34, "O₂ ")
+        MUI_XY("CA", 65, 34)
+        MUI_XY("CB", 75, 34)
+        MUI_LABEL(85, 34, ".")
+        MUI_XY("CC", 95, 34)
+        MUI_LABEL(105, 34, " %")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 32, 58, 1, " cal ")
+        MUI_XYAT("BA", 96, 58, 3, " back ")
 
-                                                                        MUI_FORM(2)
-                                                                            MUI_STYLE(0)
-                                                                                MUI_LABEL(0, 34, "He ")
-                                                                                    MUI_XY("DA", 65, 34)
-                                                                                        MUI_XY("DB", 75, 34)
-                                                                                            MUI_LABEL(85, 34, ".")
-                                                                                                MUI_XY("DC", 95, 34)
-                                                                                                    MUI_LABEL(105, 34, " %")
-                                                                                                        MUI_STYLE(1)
-                                                                                                            MUI_XYAT("EX", 32, 58, 2, " cal ")
-                                                                                                                MUI_XYAT("BA", 96, 58, 3, " back ")
-
+        MUI_FORM(2)
+        MUI_STYLE(0)
+        MUI_LABEL(0, 34, "He ")
+        MUI_XY("DA", 65, 34)
+        MUI_XY("DB", 75, 34)
+        MUI_LABEL(85, 34, ".")
+        MUI_XY("DC", 95, 34)
+        MUI_LABEL(105, 34, " %")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 32, 58, 2, " cal ")
+        MUI_XYAT("BA", 96, 58, 3, " back ")
     ;
 
 // END mui Menu elements
@@ -178,7 +176,6 @@ void setup()
     Wire.begin();
 
     // buttons and display Initialise
-
     if (menu_initialise())
     {
         Serial.println("Display Connected");
@@ -223,7 +220,6 @@ void loop()
 
     if (mui.isFormActive())
     {
-        /* update the display content, if the redraw flag is set */
         if (is_redraw)
         {
             u8g2.clearBuffer();
@@ -238,10 +234,9 @@ void loop()
 
             u8g2.sendBuffer();
 
-            is_redraw = 0; /* clear the redraw flag */
+            is_redraw = 0; 
         }
 
-        /* handle events */
         switch (u8g2.getMenuEvent())
         {
         case U8X8_MSG_GPIO_MENU_SELECT:
@@ -299,8 +294,6 @@ void loop()
             navigate_submenu();
         }
     }
-
-    // run_menu();
 }
 
 // Functions
@@ -467,7 +460,6 @@ void run_menu()
             u8g2.drawGlyph(0, u8g2.getDisplayHeight(), 65); // left arrow
         }
 
-        // u8g2.setFont(u8g2_font_unifont_te);
         u8g2.setFont(u8g2_font_helvR12_te);
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width(menu_entry_list[destination_state.position].name)) / 2, u8g2.getDisplayHeight() - 5);
         u8g2.print(menu_entry_list[destination_state.position].name);
@@ -496,7 +488,6 @@ void navigate_menu()
     if (button_event == U8X8_MSG_GPIO_MENU_SELECT)
     {
         current_view = SUB_MENU;
-        // u8g2.userInterfaceMessage("Selection:", menu_entry_list[destination_state.position].name, "", " Ok ");
     }
     if (button_event > 0) // all known events are processed, clear event
         button_event = 0;
@@ -533,8 +524,6 @@ void run_submenu()
 
     u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
-    // u8g2.UTF8((u8g2.getDisplayWidth() - u8g2.getStrWidth("main menu")) / 2, u8g2.getDisplayHeight(), "main menu");
-
     switch (destination_state.position)
     {
     case 0: // Oxygen
@@ -555,8 +544,6 @@ void run_submenu()
         u8g2.print("Cell ");
         u8g2.print(O2_millivolts, 1);
         u8g2.print(" mV");
-        // u8g2.print(" | ");
-        // u8g2.print(O2_cal_target, 1);
 
         u8g2.setFont(u8g2_font_helvR24_te);
 
@@ -644,7 +631,7 @@ void run_submenu()
     case 3: // Calibrate
         u8g2.setFont(u8g2_font_helvR12_te);
 
-        mui.gotoForm(/* form_id= */ 3, /* initial_cursor_position= */ 0);
+        mui.gotoForm(3, 0);
 
         break;
     case 4: // Raw Data

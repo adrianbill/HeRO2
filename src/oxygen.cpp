@@ -51,13 +51,6 @@ void calibrate_oxygen()
     // converts reading to voltage in mV
     double millivolts = ads.toVoltage(RA_O2_calibration.getAverage()) * 1000;
 
-    // Serial.print("Voltage: ");
-    // Serial.print(millivolts, 2);
-    // Serial.print("mV");
-    // Serial.print(" ±");
-    // Serial.print(RA_O2_calibration.getStandardDeviation(), 2);
-    // Serial.println("mV");
-
     O2_calibration = O2_cal_target / millivolts;
 
     Serial.println("O₂ Calibrated");
@@ -73,15 +66,6 @@ double oxygen_measurement()
 
     // converts average reading to voltage in mV
     double voltage_meas = ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
-
-    // Serial.print("Voltage: ");
-    // Serial.print(voltage_meas, 2);
-    // Serial.print("mV");
-    // Serial.print("  ||  O₂: ");
-    // Serial.print(voltage_meas * O2_cal_factor, 2);
-    // Serial.print("% ±");
-    // Serial.print(ads.toVoltage(RA_O2_measure.getStandardDeviation()) * 1000 * O2_cal_factor, 2);
-    // Serial.println("%");
 
     return voltage_meas * O2_calibration; // Convert mV ADC reading to % O2
 }

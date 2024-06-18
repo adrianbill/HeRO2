@@ -71,19 +71,6 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
         He_fraction = gain * error + He_fraction;
 
-        // //Debudding serial monitor text
-        // Serial.print("Error: ");
-        // Serial.print(error, 2);
-        // Serial.print(" | He: ");
-        // Serial.print(He_fraction, 2);
-        // Serial.print(" | meas: ");
-        // Serial.print(speed_of_sound_measured, 1);
-        // Serial.print(" | calc: ");
-        // Serial.println(speed_of_sound_calculated, 1);
-
-        // delay(1000);
-        // //end of debugging section
-
         if (He_fraction > He_fraction_max)
         {
             He_fraction = He_fraction_max;
