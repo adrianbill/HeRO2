@@ -518,7 +518,7 @@ void run_submenu()
         O2_fraction = oxygen_measurement(O2_calibration);
         H2O_fraction = water_measurement(temperature, relative_humidity, local_pressure);
 
-        if (helium_check == 0)
+        if (helium_check == 0) // checks is Helium measurement has been done since restart is yes it uses the previously stored reading as a starting point.
         {
             He_fraction = 0;
             helium_check = 1;

@@ -18,4 +18,4 @@
     extern constexpr double H2O_molar_mass{0.01802};
 
     // calibrated distance in m
-    extern constexpr double distance_calibrated{0.04656};
+    extern constexpr double distance_calibrated{0.0517};

@@ -27,6 +27,11 @@ double calculate_molar_mass(double He_fraction, double O2_fraction, double N2_fr
 // Function to calculate the effective adiabatic index (G_i=(gamma_i−1)^-1
 double calculate_adiabatic_index(double He_fraction, double O2_fraction, double N2_fraction, double H2O_fraction)
 {
+    
+    
+    
+    
+    
     return (1 / (He_fraction * (1 / (He_adiabatic_index - 1)) + O2_fraction * (1 / (O2_adiabatic_index - 1)) + N2_fraction * (1 / (N2_adiabatic_index - 1)) + H2O_fraction * (1 / (H2O_adiabatic_index - 1)))) + 1;
 }
 
@@ -58,14 +63,15 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
         He_fraction = gain * error + He_fraction;
 
-        Serial.print("Error: ");
-        Serial.print(error, 2);
-        Serial.print(" | He: ");
-        Serial.print(He_fraction, 2);
-        Serial.print(" | meas: ");
-        Serial.print(speed_of_sound_measured, 1);
-        Serial.print(" | calc: ");
-        Serial.println(speed_of_sound_calculated, 1);
+        // //Debudding serial monitor text
+        // Serial.print("Error: ");
+        // Serial.print(error, 2);
+        // Serial.print(" | He: ");
+        // Serial.print(He_fraction, 2);
+        // Serial.print(" | meas: ");
+        // Serial.print(speed_of_sound_measured, 1);
+        // Serial.print(" | calc: ");
+        // Serial.println(speed_of_sound_calculated, 1);
 
         // Serial.print("MM: ");
         // Serial.print(mix_molar_mass * 1000, 2);
@@ -75,6 +81,7 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
         // Serial.println(speed_of_sound_calculated, 1);
 
         // delay(1000);
+        // //end of debugging section
 
         if (He_fraction > He_fraction_max)
         {
@@ -93,56 +100,3 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
     return He_fraction;
 }
-
-// // old function to trigger helium reading
-// double helium_measurement(double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature)
-// {
-
-//     double N2_fraction = 1.0 - O2_fraction - H2O_fraction; // Assume N2 makes up the rest
-//     double He_fraction = 0.0;
-//     double maHe_fraction = 1 - O2_fraction - H2O_fraction;
-
-//     // Iterate to solve for He fraction
-
-//     for (int i = 0; i < 1000; i++)
-//     {
-//         double N2_modified = N2_fraction - He_fraction;
-
-//         // Ensure He fraction stays within valid range
-//         // if (N2_modified < 0)
-//         // {
-//         //     He_fraction = N2_fraction; // Ensure the fraction does not go negative
-//         //     break;
-//         // }
-//         // else
-//         if (He_fraction > maHe_fraction)
-//         {
-//             He_fraction = maHe_fraction;
-//             break;
-//         }
-//         else if (He_fraction < 0)
-//         {
-//             He_fraction = 0;
-//             break;
-//         }
-
-//         double mix_molar_mass = calculate_molar_mass(He_fraction, O2_fraction, N2_modified, H2O_fraction);
-//         double mix_adiabatic_index = calculate_adiabatic_index(He_fraction, O2_fraction, N2_modified, H2O_fraction);
-
-//         double speed_of_sound_calculated = calculate_speed_of_sound(mix_adiabatic_index, mix_molar_mass, temperature);
-
-//         double error = speed_of_sound_measured - speed_of_sound_calculated;
-
-//         if (abs(error) < 0.001)
-//         {
-//             break; // Converged to solution within tolerance
-//         }
-
-//         // Adjust He fraction for next iteration
-//         He_fraction += 0.0001 * error; // Simple proportional adjustment
-
-//         N2_fraction = 1.0 - He_fraction - O2_fraction - H2O_fraction;
-//     }
-
-//     return He_fraction;
-// }

@@ -56,7 +56,7 @@ double measure_duration()
     Serial.print("Dur 1: ");
     Serial.println(duration0);
 
-    delay(50);
+    // delay(50);
 
     // Clear the trigger pin
     digitalWrite(trigPin, LOW);
