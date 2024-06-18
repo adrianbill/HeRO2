@@ -10,7 +10,7 @@ Relative humidity ($RH$) is the water fraction in a gas relative to the maximum 
 
 ### Saturation Vapour Pressure
 
-The saturation vapour pressure (&p_{sat}&) is the pressure at which water vapour is in thermodynamic equilibrium with its condensed state. Simply, it is the maximum partial pressure that water achieve at a given atmospheric temperature.
+The saturation vapour pressure (&p\_{sat}&) is the pressure at which water vapour is in thermodynamic equilibrium with its condensed state. Simply, it is the maximum partial pressure that water achieve at a given atmospheric temperature.
 
 To estimate the saturation vapour pressure the Tetens equation is used. For temperatures above $0\degree C$ the Tetens equation is:
 
@@ -32,10 +32,10 @@ $c = \sqrt{\Large \frac{{\large \gamma} R T}{M}}$
 
 where:
 
-- $\large \gamma$ is the adiabatic index (heat capacity ratio),
-- $R$ is the universal gas constant $(8.314\ ^J/_{K\cdot mol})$,
-- $T$ is the absolute temperature $(K)$,
-- $M$ is the molar mass of the gas mixture $(K)$.
+-   $\large \gamma$ is the adiabatic index (heat capacity ratio),
+-   $R$ is the universal gas constant $(8.314\ ^J/_{K\cdot mol})$,
+-   $T$ is the absolute temperature $(K)$,
+-   $M$ is the molar mass of the gas mixture $(K)$.
 
 ### Individual Gas Properties
 
@@ -49,8 +49,8 @@ $\Large \gamma = \frac{C_p}{C_v}$
 
 where:
 
-- $C_p$ is specific heat capacity at constant pressure $(^J/_{K\cdot mol})$
-- $C_v$ is specific heat capacity at constant volume $(^J/_{K\cdot mol})$
+-   $C_p$ is specific heat capacity at constant pressure $(^J/_{K\cdot mol})$
+-   $C_v$ is specific heat capacity at constant volume $(^J/_{K\cdot mol})$
 
 and
 
@@ -74,15 +74,15 @@ For polyatomic molecules, there is evidence of contribution of vibrational degre
 
 The heat capacities, adiabatic indices, and molar masses for relevant gasses.
 
-| $Gas$  | $C_p$                | $C_v$                | $\Large \gamma$ | $M$ |
-|--------|---------------------:|---------------------:|----------------:|----:|
-| -      |$\frac{J}{K\cdot mol}$|$\frac{J}{K\cdot mol}$|     -           |$\frac{g}{mol}$|
-| $He$   | 20.79                | 12.48                |     1.666       |     4.003     |
-| $O_2$  | 29.38                | 21.07                |     1.394       |    31.999     |
-| $N_2$  | 29.12                | 20.81                |     1.399       |    28.013     |
-| $H_2O$ | 33.58                | 25.27                |     1.329       |    18.015     |
-| $CO$   | 29.15                | 20.84                |     1.399       |    28.010     |
-| $CO_2$ | 37.12                | 28.81                |     1.288       |    44.009     |
+| $Gas$  |                  $C_p$ |                  $C_v$ | $\Large \gamma$ |             $M$ |
+| ------ | ---------------------: | ---------------------: | --------------: | --------------: |
+| -      | $\frac{J}{K\cdot mol}$ | $\frac{J}{K\cdot mol}$ |               - | $\frac{g}{mol}$ |
+| $He$   |                  20.79 |                  12.48 |           1.666 |           4.003 |
+| $O_2$  |                  29.38 |                  21.07 |           1.394 |          31.999 |
+| $N_2$  |                  29.12 |                  20.81 |           1.399 |          28.013 |
+| $H_2O$ |                  33.58 |                  25.27 |           1.329 |          18.015 |
+| $CO$   |                  29.15 |                  20.84 |           1.399 |          28.010 |
+| $CO_2$ |                  37.12 |                  28.81 |           1.288 |          44.009 |
 
 [Ref: NIST Chemistry WebBook](https://webbook.nist.gov/chemistry/):
 
@@ -100,7 +100,7 @@ $C_{v,mix} = \sum_{i}x_i C_{v,i}$
 
 where:
 
-- $x$ is the molar fraction of the individual gasses
+-   $x$ is the molar fraction of the individual gasses
 
 The effective adiabatic index of the gas mixture can then be calculated using the same formula as that of a single gas.
 
@@ -118,7 +118,7 @@ $M_{mix} = \sum_{i}x_i M_i$
 
 where:
 
-- $x$ is the molar fraction of the individual gasses
+-   $x$ is the molar fraction of the individual gasses
 
 ### Logic
 
@@ -126,9 +126,9 @@ To calculate the helium (He) fraction in a gas mixture comprising helium, oxygen
 
 #### 1. Define the gas mixture composition
 
-- $x_{He}$ be the mole fraction of helium.
-- $x_{O_2}$ be the mole fraction of oxygen (given).
-- $x_{N_2} = 1 - x_{He} - x_{O_2}$ be the mole fraction of nitrogen.
+-   $x_{He}$ be the mole fraction of helium.
+-   $x_{O_2}$ be the mole fraction of oxygen (given).
+-   $x_{N_2} = 1 - x_{He} - x_{O_2}$ be the mole fraction of nitrogen.
 
 #### 2. Calculate average molar mass of the mixture
 
@@ -136,20 +136,26 @@ $M_{mix} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
 
 #### 3. Calculate the effective adiabatic index
 
+For ease of manipulating the calculation,
+
 Let $G_i =  ({\large \gamma}_i-1)^{-1}$
 
 $\gamma_{mix} = (x_{He} G_{He} + x_{O_2} G_{O_2} + (1 - x_{He} - x_{O_2}) G_{N_2})^{-1} + 1$
 
-#### 4. Use the speed of sound formula
+#### 4. Solve for $x_{He}$ using the speed of sound formula
 
-Rearrange the speed of sound formula to solve for the molar mass of the mixture:
+$c = \sqrt{\frac{{\large \gamma_{mix}} R T}{M_{mix}}}$
 
-$M = {\Large \frac{{\large \gamma} R T}{c^2}}$
+Since both $\large \gamma_{mix}$ and $M_{mix}$ both depends on $x_{He}$, this is a non-linear equation. It can be solved iteratively or using numerical methods. In this case, an iterative approach will be taken using a proportional control method for adjusting estimates.
 
-#### 5. Set up the equation to solve for $x_{He}$
-
-By equating the expression for $M$ from the speed of sound with the expression for the average molar mass of the mixture, we get:
-
-${\Large \frac{\gamma_{mix} R T}{v^2}} = x_{He} M_{He} + x_{O_2} M_{O_2} + (1 - x_{He} - x_{O_2}) M_{N_2}$
-
-This equation contains the unknown $x_{He}$. Since $\gamma_{\text{mix}}$ also depends on $x_{He}$, this is a non-linear equation. It can be solved iteratively or using numerical methods to find the value of $x_{He}$.
+1. Assume $x_{He} = 0$
+2. Calculate the speed of sound
+3. Measure the speed of sound
+4. Set proportional control parameters
+    1. Desired error threshold (e.g. 1 m/s)
+    2. Gain, $K_p$ (e.g. 0.001)
+5. Calculate error, $err$ (the difference between measured and calculated values)
+6. If it is:
+    1. Below the error threshold: accept the $x_{He}$ value
+    2. Above the error threshold: adjust $x_{He}$ using proportional method $ x_{He(new)} = {\small K}_p \cdot err + x_{He(initial)}$
+7. Return to step 2
