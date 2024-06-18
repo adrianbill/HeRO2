@@ -1,8 +1,8 @@
 #ifndef OXYGEN_H
 #define OXYGEN_H
 
-double calibrate_oxygen(double);
-double oxygen_measurement(double);
+void calibrate_oxygen();
+double oxygen_measurement();
 double oxygen_millivolts();
 int O2_Initialise();
 

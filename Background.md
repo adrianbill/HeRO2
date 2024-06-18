@@ -1,4 +1,14 @@
-# Calculations
+# Background & Approach
+
+## Assumptions
+
+- Electro-galvanic sensor is linear (i.e. single point calibration)
+- Gas composition for speed of sound calculations includes only:
+  - Helium ($He$)
+  - Oxygen ($O_2$)
+  - Nitrogen ($N_2$)
+  - Water ($H_2$)
+- Carbon Monoxide ($CO$) levels will only be used as a safety measure.
 
 ## Water Fraction and Relative Humidity
 
@@ -10,7 +20,7 @@ Relative humidity ($RH$) is the water fraction in a gas relative to the maximum 
 
 ### Saturation Vapour Pressure
 
-The saturation vapour pressure (&p\_{sat}&) is the pressure at which water vapour is in thermodynamic equilibrium with its condensed state. Simply, it is the maximum partial pressure that water achieve at a given atmospheric temperature.
+The saturation vapour pressure ($p\_{sat}$) is the pressure at which water vapour is in thermodynamic equilibrium with its condensed state. Simply, it is the maximum partial pressure that water achieve at a given atmospheric temperature.
 
 To estimate the saturation vapour pressure the Tetens equation is used. For temperatures above $0\degree C$ the Tetens equation is:
 

@@ -5,6 +5,7 @@
 // custom headers
 #include "helium.h"
 #include "constants.h"
+#include "environment.h" // environmenttal parameters: temperature, humidity, atmospheric pressure
 
 // Paired Header
 #include "ultrasonic.h"
@@ -17,7 +18,7 @@ const int echoPin1 = 17; // Echo pin for each ultrasonic sensors
 double measure_duration();
 
 // Running Average Setup
-RunningAverage RA_dur(50);
+RunningAverage RA_dur(100);
 
 // Initialise ultrasonic sensor & running average
 int ultrasonic_Initialise()
@@ -53,8 +54,8 @@ double measure_duration()
 
     double duration0 = pulseIn(echoPin0, HIGH);
     RA_dur.addValue(duration0);
-    Serial.print("Dur 1: ");
-    Serial.println(duration0);
+    // Serial.print("Dur 1: ");
+    // Serial.print(duration0);
 
     // delay(50);
 
@@ -69,8 +70,8 @@ double measure_duration()
 
     double duration1 = pulseIn(echoPin1, HIGH);
     RA_dur.addValue(duration1);
-    Serial.print(" | Dur 2: ");
-    Serial.println(duration1);
+    // Serial.print(" | Dur 2: ");
+    // Serial.println(duration1);
 
     return RA_dur.getAverage() / 1000000;
 }
@@ -82,52 +83,29 @@ double speed_measurement()
     return distance_calibrated / duration; // Calculate the speeds in m/s
 }
 
-// Function to calibrate distance
-double calibrate_distance(int gas, double T, double H2O_fraction)
+// Function to calibrate distance, returns distance in m
+void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fraction)
 {
-    double speed_of_sound_calculated, mix_molar_mass, mix_adiabatic_index;
+    double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
 
-    switch (gas)
-    {
-    case 1:
-        // dry air
-        mix_molar_mass = calculate_molar_mass(0, 0.209, (1 - 0.209), 0);
-        mix_adiabatic_index = calculate_adiabatic_index(0, 0.209, (1 - 0.209), 0);
-        speed_of_sound_calculated = calculate_speed_of_sound(mix_adiabatic_index, mix_molar_mass, T);
-        break;
-    case 2:
-        // ambient air
-        mix_molar_mass = calculate_molar_mass(0, 0.209, (1 - 0.209), H2O_fraction);
-        mix_adiabatic_index = calculate_adiabatic_index(0, 0.209, (1 - 0.209), H2O_fraction);
-        speed_of_sound_calculated = calculate_speed_of_sound(mix_adiabatic_index, mix_molar_mass, T);
-        // speed_of_sound_calculated = 348.5;
-        break;
-    case 3:
-        // Oxygen
-        mix_molar_mass = calculate_molar_mass(0, 1, 0, 0);
-        mix_adiabatic_index = calculate_adiabatic_index(0, 0.209, (1 - 0.209), 0);
-        speed_of_sound_calculated = calculate_speed_of_sound(mix_adiabatic_index, mix_molar_mass, T);
-        break;
-    case 4:
-        // Helium
-        mix_molar_mass = calculate_molar_mass(1, 0, 0, 0);
-        mix_adiabatic_index = calculate_adiabatic_index(0, 0.209, (1 - 0.209), 0);
-        speed_of_sound_calculated = calculate_speed_of_sound(mix_adiabatic_index, mix_molar_mass, T);
-        break;
-    }
+    double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
 
     double duration = measure_duration();
 
-    double distance = speed_of_sound_calculated * duration;
+    // // debugging
+    // double distance = speed_of_sound_calculated * duration;
 
-    Serial.print("Speed Cal: ");
-    Serial.print(speed_of_sound_calculated);
+    // Serial.print("Speed Cal: ");
+    // Serial.print(speed_of_sound_calculated);
 
-    Serial.print(" | Dur: ");
-    Serial.print(duration * 1000000);
-    Serial.print(" µs | Dist: ");
-    Serial.print(distance * 1000);
-    Serial.println(" mm");
+    // Serial.print(" | Dur: ");
+    // Serial.print(duration * 1000000);
+    // Serial.print(" µs | Dist: ");
+    // Serial.print(distance * 1000);
+    // Serial.println(" mm");
+    // // end debugging
 
-    return distance;
+    distance_calibrated = speed_of_sound_calculated * duration;
+
+    Serial.println("Dist Calibrated");
 }

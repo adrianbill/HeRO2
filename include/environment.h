@@ -5,6 +5,6 @@ int Environment_Initialise();
 double temperature_measurement();
 double humidity_measurement();
 double atmpressure_measurement();
-double water_measurement(double, double, double);
+double water_measurement();
 
 #endif

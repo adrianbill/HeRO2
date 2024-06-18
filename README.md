@@ -1,26 +1,25 @@
 # HeRO<sub>2</sub>
 
-Gas analyser with other extravagant features to complicated and simply divering
+Gas analyser for mixed gas divering.
 
-## Introduction
+## Objectives
 
-### Objectives
+### Main
 
- 1. To measure the oxygen and helium fractions in a gas mixture for scuba diving.
- 2. To measure the water fraction of the gas mixture.
- 3. Detect Carbon monoxide levels as a safety precaution
+-   To measure the oxygen and helium fractions in a gas mixture for scuba diving
 
-### Basic Methods
+### Secondary
 
-- Oxygen fraction will be measured using an electro-galvanic sensor.
-- Helium fraction will be measured using an ultrasonic sensor via speed of sound calculations.
-- Water fraction will be measured using Relative Humidity, temperature and atmospheric temperature.
+-   To measure the water fraction of the gas mixture
+-   Detect Carbon monoxide levels as a safety precaution
 
-### Assumptions
+## Basic Methods
 
-- Gas composition for speed of sound calculations includes only:
-  - Helium ($He$)
-  - Oxygen ($O_2$)
-  - Nitrogen ($N_2$)
-  - Water ($H_2$)
-- Carbon Monoxide ($CO$) levels will only be used as a safety measure.
+-   Oxygen fraction: electro-galvanic sensor
+-   Helium fraction: ultrasonic sensor via speed of sound calculations
+-   Water fraction: Relative Humidity, temperature and atmospheric temperature
+-   Carbon monoxide: TBD
+
+## Contents
+- [Background & Approach](./Background.md)
+- [Design & Layout](.Design.md)

@@ -4,6 +4,9 @@
 #include <RunningAverage.h> // Running Average Library
 #include <ADS1X15.h>        // ADC / Amplifier Library
 
+// Custom Headers
+#include "constants.h"
+
 // Paired Header
 #include "oxygen.h"
 
@@ -11,8 +14,8 @@
 ADS1115 ads(0x48);
 
 // O2 running average setup
-RunningAverage RA_O2_measure(20);
-RunningAverage RA_O2_calibration(50);
+RunningAverage RA_O2_measure(100);
+RunningAverage RA_O2_calibration(100);
 
 // Initialiases Analog to Digital Converter for O2 Sensor and clear running average
 int O2_Initialise()
@@ -31,7 +34,7 @@ int O2_Initialise()
 }
 
 // Function to calibration Oxygen
-double calibrate_oxygen(double target_O2)
+void calibrate_oxygen()
 {
 
     RA_O2_calibration.clear();
@@ -54,12 +57,14 @@ double calibrate_oxygen(double target_O2)
     // Serial.print(" ±");
     // Serial.print(RA_O2_calibration.getStandardDeviation(), 2);
     // Serial.println("mV");
+
+    O2_calibration = O2_cal_target / millivolts;
+
     Serial.println("O₂ Calibrated");
-    return target_O2 / millivolts;
 }
 
 // Function to measure Oxygen
-double oxygen_measurement(double O2_cal_factor)
+double oxygen_measurement()
 {
 
     int16_t reading = ads.readADC_Differential_0_1();
@@ -78,7 +83,7 @@ double oxygen_measurement(double O2_cal_factor)
     // Serial.print(ads.toVoltage(RA_O2_measure.getStandardDeviation()) * 1000 * O2_cal_factor, 2);
     // Serial.println("%");
 
-    return voltage_meas * O2_cal_factor; // Convert mV ADC reading to % O2
+    return voltage_meas * O2_calibration; // Convert mV ADC reading to % O2
 }
 
 // Function to return O2 millivolts
