@@ -79,3 +79,8 @@ double oxygen_millivolts()
 
     return ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
 }
+
+double MOD_calculate(double O2_fraction, double O2_partial_pressure)
+{
+    return 10 * (O2_partial_pressure/O2_fraction - 1);
+}
