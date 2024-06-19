@@ -1,6 +1,7 @@
 // Libraries
 #include <Arduino.h>        // Basic Library
 #include <Wire.h>           // I2C Library
+#include <math.h>           // Math Library
 #include <RunningAverage.h> // Running Average Library
 #include <ADS1X15.h>        // ADC / Amplifier Library
 
@@ -80,7 +81,18 @@ double oxygen_millivolts()
     return ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
 }
 
-double MOD_calculate(double O2_fraction, double O2_partial_pressure)
+int MOD_O2_calculate(double O2_fraction, double O2_partial_pressure)
 {
-    return 10 * (O2_partial_pressure/O2_fraction - 1);
+    return round(10 * (O2_partial_pressure/O2_fraction - 1));
+}
+
+int MOD_density_calculate(double He_fraction, double O2_fraction, double H2O_fraction, double temperature, double density)
+{
+    double N2_fraction = 1 - (He_fraction + O2_fraction + H2O_fraction);
+
+    double mix_molar_mass_g = 1000 * (He_fraction * He_molar_mass + O2_fraction * O2_molar_mass + N2_fraction * N2_molar_mass + H2O_fraction * H2O_molar_mass);
+
+    double pressure_kPa = (R_gas_constant * temperature * density) / mix_molar_mass_g;
+
+    return round(0.1 * pressure_kPa - 10);
 }

@@ -54,7 +54,7 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 //  New function to trigger helium reading under development
 double helium_measurement(double He_fraction, double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature)
 {
- 
+
     double gain = 0.001;
     double threshold = 1.0;
     double error = 0.0;
@@ -90,3 +90,4 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
     return RA_He.getAverage();
 }
+

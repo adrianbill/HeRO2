@@ -35,16 +35,6 @@ struct menu_state
     uint8_t position;       /* position, array index */
 };
 
-// Distance Calibration gas struct definition
-struct gas_type
-{
-    const char *name;
-    double He_fraction;
-    double O2_fraction;
-    double N2_fraction;
-    double H2O_fraction;
-};
-
 enum View
 {
     MAIN_MENU,
@@ -71,8 +61,15 @@ struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
 struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
 int8_t button_event = 0; // set this to 0, once the event has been processed
 View current_view = MAIN_MENU;
+int submenu_selected = 0;
 uint8_t is_redraw = 1;
+
 int helium_check = 0;
+
+double temperature_last;
+double O2_fraction_last;
+double He_fraction_last;
+double H2O_fraction_last;
 
 // Functions
 int menu_initialise();
@@ -132,37 +129,36 @@ muif_t muif_list[] = {
 
 fds_t fds_data[] =
 
-        MUI_FORM(3)
+    MUI_FORM(3)
         MUI_STYLE(0)
-        MUI_XYAT("BO", 32, 34, 1, " O₂ ")
-        MUI_XYAT("BH", 96, 34, 2, " He ")
-        MUI_STYLE(1)
-        MUI_XYAT("EX", 64, 58, 3, " exit ")
+            MUI_XYAT("BO", 32, 34, 1, " O₂ ")
+                MUI_XYAT("BH", 96, 34, 2, " He ")
+                    MUI_STYLE(1)
+                        MUI_XYAT("EX", 64, 58, 3, " exit ")
 
-        MUI_FORM(1)
-        MUI_STYLE(0)
-        MUI_LABEL(0, 34, "O₂ ")
-        MUI_XY("CA", 65, 34)
-        MUI_XY("CB", 75, 34)
-        MUI_LABEL(85, 34, ".")
-        MUI_XY("CC", 95, 34)
-        MUI_LABEL(105, 34, " %")
-        MUI_STYLE(1)
-        MUI_XYAT("EX", 32, 58, 1, " cal ")
-        MUI_XYAT("BA", 96, 58, 3, " back ")
+                            MUI_FORM(1)
+                                MUI_STYLE(0)
+                                    MUI_LABEL(0, 34, "O₂ ")
+                                        MUI_XY("CA", 65, 34)
+                                            MUI_XY("CB", 75, 34)
+                                                MUI_LABEL(85, 34, ".")
+                                                    MUI_XY("CC", 95, 34)
+                                                        MUI_LABEL(105, 34, " %")
+                                                            MUI_STYLE(1)
+                                                                MUI_XYAT("EX", 32, 58, 1, " cal ")
+                                                                    MUI_XYAT("BA", 96, 58, 3, " back ")
 
-        MUI_FORM(2)
-        MUI_STYLE(0)
-        MUI_LABEL(0, 34, "He ")
-        MUI_XY("DA", 65, 34)
-        MUI_XY("DB", 75, 34)
-        MUI_LABEL(85, 34, ".")
-        MUI_XY("DC", 95, 34)
-        MUI_LABEL(105, 34, " %")
-        MUI_STYLE(1)
-        MUI_XYAT("EX", 32, 58, 2, " cal ")
-        MUI_XYAT("BA", 96, 58, 3, " back ")
-    ;
+                                                                        MUI_FORM(2)
+                                                                            MUI_STYLE(0)
+                                                                                MUI_LABEL(0, 34, "He ")
+                                                                                    MUI_XY("DA", 65, 34)
+                                                                                        MUI_XY("DB", 75, 34)
+                                                                                            MUI_LABEL(85, 34, ".")
+                                                                                                MUI_XY("DC", 95, 34)
+                                                                                                    MUI_LABEL(105, 34, " %")
+                                                                                                        MUI_STYLE(1)
+                                                                                                            MUI_XYAT("EX", 32, 58, 2, " cal ")
+                                                                                                                MUI_XYAT("BA", 96, 58, 3, " back ");
 
 // END mui Menu elements
 
@@ -234,7 +230,7 @@ void loop()
 
             u8g2.sendBuffer();
 
-            is_redraw = 0; 
+            is_redraw = 0;
         }
 
         switch (u8g2.getMenuEvent())
@@ -263,7 +259,8 @@ void loop()
 
             calibrate_run_display();
 
-            current_view = MAIN_MENU;
+            submenu_selected = 0;
+            // current_view = MAIN_MENU;
             exit_code = 0;
             button_event = 0;
             break;
@@ -272,26 +269,28 @@ void loop()
 
             dist_calibrate_run_display();
 
-            current_view = MAIN_MENU;
+            submenu_selected = 0;
+            // current_view = MAIN_MENU;
             exit_code = 0;
             button_event = 0;
             break;
         case 3:
-            current_view = MAIN_MENU;
+            submenu_selected = 0;
+            // current_view = MAIN_MENU;
             exit_code = 0;
             button_event = 0;
             break;
         default:
             break;
         }
-        if (current_view == MAIN_MENU)
-        {
-            run_menu();
-        }
-        else if (current_view == SUB_MENU)
+        if (submenu_selected)
         {
             run_submenu();
             navigate_submenu();
+        }
+        else
+        {
+            run_menu();
         }
     }
 }
@@ -487,10 +486,25 @@ void navigate_menu()
         to_left(&destination_state);
     if (button_event == U8X8_MSG_GPIO_MENU_SELECT)
     {
-        current_view = SUB_MENU;
+        submenu_selected = destination_state.position + 1;
     }
     if (button_event > 0) // all known events are processed, clear event
         button_event = 0;
+}
+
+void navigate_submenu()
+{
+    if (button_event == U8X8_MSG_GPIO_MENU_SELECT)
+    {
+        if (submenu_selected > 0)
+        {
+            submenu_selected = submenu_selected * 10;
+        }
+    }
+    if (button_event > 0)
+    {
+        button_event = 0;
+    }
 }
 
 // new run_submenu
@@ -502,9 +516,9 @@ void run_submenu()
     int y_gap = 18;
     int x_gap = 0;
 
-    double temperature; 
+    double temperature;
     double relative_humidity;
-    double local_pressure; 
+    double local_pressure;
 
     double O2_fraction;
     double He_fraction;
@@ -524,12 +538,14 @@ void run_submenu()
 
     u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
-    switch (destination_state.position)
+    switch (submenu_selected)
     {
-    case 0: // Oxygen
-        O2_fraction = oxygen_measurement(); // fraction
-        H2O_fraction = water_measurement(); // fraction
+    case 1:                                  // Oxygen
+        O2_fraction = oxygen_measurement();  // fraction
+        H2O_fraction = water_measurement();  // fraction
         O2_millivolts = oxygen_millivolts(); // mV
+        temperature = temperature_measurement();
+        He_fraction = 0;
 
         check_button_event();
 
@@ -559,14 +575,19 @@ void run_submenu()
         u8g2.print(O2_fraction * 100, 1);
         u8g2.print(" %");
 
-        break;
-    case 1: // Trimix
-        temperature = temperature_measurement(); // Kelvin
-        speed_of_sound = speed_measurement(); // m/s
-        O2_fraction = oxygen_measurement(); // fraction
-        H2O_fraction = water_measurement(); // fraction
+        temperature_last = temperature;
+        O2_fraction_last = O2_fraction;
+        He_fraction_last = He_fraction;
+        H2O_fraction_last = H2O_fraction;
 
-        if (helium_check == 0) // checks is Helium measurement has been done since restart is yes it uses the previously stored reading as a starting point.
+        break;
+    case 2:                                      // Trimix
+        temperature = temperature_measurement(); // Kelvin
+        speed_of_sound = speed_measurement();    // m/s
+        O2_fraction = oxygen_measurement();      // fraction
+        H2O_fraction = water_measurement();      // fraction
+
+        if (!helium_check) // checks is Helium measurement has been done since restart is yes it uses the previously stored reading as a starting point.
         {
             He_fraction = 0;
             helium_check = 1;
@@ -599,9 +620,14 @@ void run_submenu()
         u8g2.print(He_fraction * 100, 1);
         u8g2.print(" %");
 
+        temperature_last = temperature;
+        O2_fraction_last = O2_fraction;
+        He_fraction_last = He_fraction;
+        H2O_fraction_last = H2O_fraction;
+
         break;
-    case 2: // Environment
-        temperature = temperature_measurement(); // Kelvin
+    case 3:                                         // Environment
+        temperature = temperature_measurement();    // Kelvin
         relative_humidity = humidity_measurement(); // fraction
         local_pressure = atmpressure_measurement(); // kPa
 
@@ -628,19 +654,19 @@ void run_submenu()
         u8g2.print(" kPa");
 
         break;
-    case 3: // Calibrate
+    case 4: // Calibrate
         u8g2.setFont(u8g2_font_helvR12_te);
 
         mui.gotoForm(3, 0);
 
         break;
-    case 4: // Raw Data
+    case 5: // Raw Data
 
-        temperature = temperature_measurement(); // Kelvin
+        temperature = temperature_measurement();    // Kelvin
         relative_humidity = humidity_measurement(); // fraction
         local_pressure = atmpressure_measurement(); // kPa
-        duration = measure_duration() * 1000000; // returns s, converts to µs
-        O2_millivolts = oxygen_millivolts(); // mV
+        duration = measure_duration() * 1000000;    // returns s, converts to µs
+        O2_millivolts = oxygen_millivolts();        // mV
 
         check_button_event();
 
@@ -682,23 +708,102 @@ void run_submenu()
         u8g2.drawHLine(0, y_gap * 3 + y_start + 4, u8g2.getDisplayWidth());
 
         break;
+
+    case 10:
+
+        u8g2.clearBuffer();
+
+        check_button_event();
+
+        u8g2.setFont(u8g2_font_helvB08_te);
+
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+        u8g2.print(O2_fraction_last * 100, 0);
+        u8g2.print(" / ");
+        u8g2.print(He_fraction_last * 100, 0);
+
+        u8g2.setFont(u8g2_font_helvB10_te);
+
+        u8g2.drawUTF8(0, y_start + 2, "MOD pO₂");
+
+        u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+
+        x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+
+        u8g2.setCursor(20, 31);
+        u8g2.print("pO₂ 1.2");
+        u8g2.setCursor(x_gap, 31);
+        u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.2));
+        u8g2.print(" m");
+
+        u8g2.setCursor(20, 45);
+        u8g2.print("pO₂ 1.4");
+        u8g2.setCursor(x_gap, 45);
+        u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.4));
+        u8g2.print(" m");
+
+        u8g2.setCursor(20, 60);
+        u8g2.print("pO₂ 1.6");
+        u8g2.setCursor(x_gap, 60);
+        u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.6));
+        u8g2.print(" m");
+
+        break;
+    case 20:
+        submenu_selected = 10;
+
+        break;
+    case 100:
+
+        u8g2.clearBuffer();
+
+        check_button_event();
+
+        u8g2.setFont(u8g2_font_helvB08_te);
+
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+        u8g2.print(O2_fraction_last * 100, 0);
+        u8g2.print(" / ");
+        u8g2.print(He_fraction_last * 100, 0);
+
+        u8g2.setFont(u8g2_font_helvB10_te);
+
+        u8g2.drawUTF8(0, y_start + 2, "MOD Den");
+
+        u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+
+        x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+
+        u8g2.setCursor(20, 31);
+        u8g2.print("5.20 g/l");
+        u8g2.setCursor(x_gap, 31);
+        u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_last, 5.2));
+        u8g2.print(" m");
+
+        u8g2.setCursor(20, 45);
+        u8g2.print("5.75 g/l");
+        u8g2.setCursor(x_gap, 45);
+        u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_last, 5.75));
+        u8g2.print(" m");
+
+        u8g2.setCursor(20, 60);
+        u8g2.print("6.30 g/l");
+        u8g2.setCursor(x_gap, 60);
+        u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_last, 6.3));
+        u8g2.print(" m");
+        
+        break;
+    case 200:
+        submenu_selected = 100;
+        break;
+    default:
+        submenu_selected = 0;
+        break;
     }
 
     u8g2.sendBuffer();
 
     check_button_event();
-}
-
-void navigate_submenu()
-{
-    if (button_event == U8X8_MSG_GPIO_MENU_SELECT)
-    {
-        current_view = MAIN_MENU;
-    }
-    if (button_event > 0)
-    {
-        button_event = 0;
-    }
 }
 
 void calibrate_run_display()

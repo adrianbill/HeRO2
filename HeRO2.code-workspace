@@ -7,13 +7,14 @@
     ],
 	"settings": {
 		"files.associations": {
-			"*.tcc": "cpp",
-			"deque": "cpp",
-			"string": "cpp",
-			"unordered_map": "cpp",
-			"unordered_set": "cpp",
-			"vector": "cpp",
-			"system_error": "cpp"
-		}
+            "*.tcc": "cpp",
+            "deque": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "unordered_set": "cpp",
+            "vector": "cpp",
+            "system_error": "cpp",
+            "cmath": "cpp"
+        }
 	}
 }
