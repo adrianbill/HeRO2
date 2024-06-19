@@ -2,8 +2,5 @@
 ## Sensors
 To complete
 
-## Block Diagram
-To complete
-
-## Wiring Diagram
-To complete
+## Circuit Diagram
+<img src="./Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>

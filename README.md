@@ -20,6 +20,9 @@ Gas analyser for mixed gas divering.
 -   Water fraction: Relative Humidity, temperature and atmospheric temperature
 -   Carbon monoxide: TBD
 
-## Contents
+## Details
 - [Background & Approach](./Background.md)
-- [Design & Layout](.Design.md)
+- [Design & Layout](./Design.md)
+
+## Circuit
+<img src="./Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>
