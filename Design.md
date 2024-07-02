@@ -3,4 +3,4 @@
 To complete
 
 ## Circuit Diagram
-<img src="./Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>
+<img src="./diagrams/Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>

@@ -25,4 +25,4 @@ Gas analyser for mixed gas divering.
 - [Design & Layout](./Design.md)
 
 ## Circuit
-<img src="./Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>
+<img src="./diagrams/Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>
