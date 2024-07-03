@@ -494,11 +494,8 @@ void run_submenu()
 	check_button_event();
 
 	u8g2.clearBuffer();
-
 	u8g2.setFont(u8g2_font_helvB10_te);
-
 	u8g2.drawUTF8(0, y_start + 2, menu_entry_list[destination_state.position].name);
-
 	u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
 	switch (submenu_selected) {
