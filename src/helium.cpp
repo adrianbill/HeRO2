@@ -24,28 +24,22 @@ double calculate_molar_mass(double He_fraction, double O2_fraction, double N2_fr
 	return He_fraction * He_molar_mass + O2_fraction * O2_molar_mass + N2_fraction * N2_molar_mass + H2O_fraction * H2O_molar_mass;
 }
 
-// Function to calculate the effective adiabatic index (G_i=(γ_i−1)^-1
+// Function to calculate the effective adiabatic index (tmp=(γ−1)^-1
 double calculate_adiabatic_index(double He_fraction, double O2_fraction, double N2_fraction, double H2O_fraction)
 {
-	double He_G = (1 / (He_adiabatic_index - 1));
-	double O2_G = (1 / (O2_adiabatic_index - 1));
-	double N2_G = (1 / (N2_adiabatic_index - 1));
-	double H2O_G = (1 / (H2O_adiabatic_index - 1));
+	double He_tmp = (1 / (He_adiabatic_index - 1));
+	double O2_tmp = (1 / (O2_adiabatic_index - 1));
+	double N2_tmp = (1 / (N2_adiabatic_index - 1));
+	double H2O_tmp = (1 / (H2O_adiabatic_index - 1));
 
-	return (1 / (He_fraction * He_G + O2_fraction * O2_G + N2_fraction * N2_G + H2O_fraction * H2O_G)) + 1;
+	return (1 / (He_fraction * He_tmp + O2_fraction * O2_tmp + N2_fraction * N2_tmp + H2O_fraction * H2O_tmp)) + 1;
 }
 
 // Function to calculate the speed of sound
 double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N2_fraction, double H2O_fraction, double temperature)
 {
-	double mix_molar_mass = He_fraction * He_molar_mass + O2_fraction * O2_molar_mass + N2_fraction * N2_molar_mass + H2O_fraction * H2O_molar_mass;
-
-	double He_G = (1 / (He_adiabatic_index - 1));
-	double O2_G = (1 / (O2_adiabatic_index - 1));
-	double N2_G = (1 / (N2_adiabatic_index - 1));
-	double H2O_G = (1 / (H2O_adiabatic_index - 1));
-
-	double mix_adiabatic_index = (1 / (He_fraction * He_G + O2_fraction * O2_G + N2_fraction * N2_G + H2O_fraction * H2O_G)) + 1;
+	double mix_molar_mass = calculate_molar_mass(He_fraction, O2_fraction, N2_fraction, H2O_fraction);
+	double mix_adiabatic_index = calculate_adiabatic_index(He_fraction, O2_fraction, N2_fraction, H2O_fraction);
 
 	return sqrt(mix_adiabatic_index * R_gas_constant * temperature / mix_molar_mass);
 }
@@ -69,13 +63,13 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
 		if (He_fraction > He_fraction_max) {
 			He_fraction = He_fraction_max;
+			N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
 			break;
 		} else if (He_fraction < 0) {
 			He_fraction = 0.0;
+			N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
 			break;
 		}
-
-		N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
 
 	} while (abs(error) > threshold);
 

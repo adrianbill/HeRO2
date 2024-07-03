@@ -7,6 +7,7 @@
 
 // Custom Headers
 #include "constants.h"
+#include "helium.h"
 
 // Paired Header
 #include "oxygen.h"
@@ -30,28 +31,22 @@ int O2_Initialise()
 	ads.setGain(16);
 
 	RA_O2_measure.clear();
-    
+
 	return 1;
 }
 
 // Function to calibration Oxygen
 void calibrate_oxygen()
 {
-
 	RA_O2_calibration.clear();
 
-	int calCount = 200; // Calibration samples
-
-	for (int i = 0; i <= calCount; i++) {
-		int16_t reading = ads.readADC_Differential_0_1();
-		RA_O2_calibration.addValue(reading);
-		delay(10);
+	for (int i = 0; i <= 500; i++) {
+		RA_O2_calibration.addValue(ads.readADC_Differential_0_1());
 	}
 
-	// converts reading to voltage in mV
-	double millivolts = ads.toVoltage(RA_O2_calibration.getAverage()) * 1000;
+	double voltage_meas_mV = ads.toVoltage(RA_O2_calibration.getAverage()) * 1000;
 
-	O2_calibration = O2_cal_target / millivolts;
+	O2_calibration = O2_cal_target / voltage_meas_mV;
 
 	Serial.println("O₂ Calibrated");
 }
@@ -59,23 +54,15 @@ void calibrate_oxygen()
 // Function to measure Oxygen
 double oxygen_measurement()
 {
+	double voltage_meas_mV = oxygen_millivolts();
 
-	int16_t reading = ads.readADC_Differential_0_1();
-
-	RA_O2_measure.addValue(reading);
-
-	// converts average reading to voltage in mV
-	double voltage_meas = ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
-
-	return voltage_meas * O2_calibration; // Convert mV ADC reading to % O2
+	return voltage_meas_mV * O2_calibration;
 }
 
 // Function to return O2 millivolts
 double oxygen_millivolts()
 {
-	int16_t reading = ads.readADC_Differential_0_1();
-
-	RA_O2_measure.addValue(reading);
+	RA_O2_measure.addValue(ads.readADC_Differential_0_1());
 
 	return ads.toVoltage(RA_O2_measure.getAverage()) * 1000;
 }
@@ -88,9 +75,7 @@ int MOD_O2_calculate(double O2_fraction, double O2_partial_pressure)
 int MOD_density_calculate(double He_fraction, double O2_fraction, double H2O_fraction, double temperature, double density)
 {
 	double N2_fraction = 1 - (He_fraction + O2_fraction + H2O_fraction);
-
-	double mix_molar_mass_g = 1000 * (He_fraction * He_molar_mass + O2_fraction * O2_molar_mass + N2_fraction * N2_molar_mass + H2O_fraction * H2O_molar_mass);
-
+	double mix_molar_mass_g = 1000 * calculate_molar_mass(He_fraction, O2_fraction, N2_fraction, H2O_fraction);
 	double pressure_kPa = (R_gas_constant * temperature * density) / mix_molar_mass_g;
 
 	return round(0.1 * pressure_kPa - 10);
