@@ -80,9 +80,7 @@ double speed_measurement()
 void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fraction)
 {
 	double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
-
 	double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
-
 	double duration = measure_duration();
 
 	distance_calibrated = speed_of_sound_calculated * duration;

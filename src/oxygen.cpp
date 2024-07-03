@@ -18,7 +18,7 @@ ADS1115 ads(0x48);
 RunningAverage RA_O2_measure(100);
 RunningAverage RA_O2_calibration(100);
 
-// Initialiases Analog to Digital Converter for O2 Sensor and clear running average
+// Initialises Analog to Digital Converter for O2 Sensor and clear running average
 int O2_Initialise()
 {
 	if (!ads.begin()) {
@@ -30,6 +30,7 @@ int O2_Initialise()
 	ads.setGain(16);
 
 	RA_O2_measure.clear();
+    
 	return 1;
 }
 
