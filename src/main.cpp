@@ -540,7 +540,8 @@ void run_submenu()
 
     switch (submenu_selected)
     {
-    case 1:                                  // Oxygen
+        // Oxygen
+    case 1:
         O2_fraction = oxygen_measurement();  // fraction
         H2O_fraction = water_measurement();  // fraction
         O2_millivolts = oxygen_millivolts(); // mV

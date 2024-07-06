@@ -28,31 +28,31 @@ int ultrasonic_Initialise()
     pinMode(echoPin0, INPUT);
 //     pinMode(echoPin1, INPUT);
 
-	RA_dur.clear();
+        RA_dur.clear();
 
-	if (!measure_duration()) {
-		Serial.println("Failed to measure speed.");
-		while (1)
-			;
-	}
+        if (!measure_duration()) {
+                Serial.println("Failed to measure speed.");
+                while (1)
+                        ;
+        }
 
-	return 1;
+        return 1;
 }
 
 // Function to measure the sound travel time in seconds one way
 double measure_duration()
 {
-	// Clear the trigger pin
-	digitalWrite(trigPin, LOW);
-	delayMicroseconds(2);
+        // Clear the trigger pin
+        digitalWrite(trigPin, LOW);
+        delayMicroseconds(2);
 
-	// Send a 10 microsecond pulse to trigger the sensor
-	digitalWrite(trigPin, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(trigPin, LOW);
+        // Send a 10 microsecond pulse to trigger the sensor
+        digitalWrite(trigPin, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trigPin, LOW);
 
-	double duration0 = pulseIn(echoPin0, HIGH);
-	RA_dur.addValue(duration0);
+        double duration0 = pulseIn(echoPin0, HIGH);
+        RA_dur.addValue(duration0);
 
 //     // Clear the trigger pin
 //     digitalWrite(trigPin, LOW);
@@ -66,24 +66,24 @@ double measure_duration()
 //     double duration1 = pulseIn(echoPin1, HIGH);
 //     RA_dur.addValue(duration1);
 
-	return RA_dur.getAverage() / 1000000;
+        return RA_dur.getAverage() / 1000000;
 }
 
 // speed of sound measurement
 double speed_measurement()
 {
-	double duration = measure_duration();
-	return distance_calibrated / duration; // Calculate the speeds in m/s
+        double duration = measure_duration();
+        return distance_calibrated / duration; // Calculate the speeds in m/s
 }
 
 // Function to calibrate distance, returns distance in m
 void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fraction)
 {
-	double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
-	double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
-	double duration = measure_duration();
+        double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
+        double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
+        double duration = measure_duration();
 
-	distance_calibrated = speed_of_sound_calculated * duration;
+        distance_calibrated = speed_of_sound_calculated * duration;
 
-	Serial.println("Dist Calibrated");
+        Serial.println("Dist Calibrated");
 }
