@@ -493,13 +493,13 @@ void run_submenu()
 
 	check_button_event();
 
-    u8g2.clearBuffer();
+	u8g2.clearBuffer();
 
-    u8g2.setFont(u8g2_font_helvR10_te);
+	u8g2.setFont(u8g2_font_helvR10_te);
 
-    u8g2.drawUTF8(0, y_start + 2, menu_entry_list[destination_state.position].name);
+	u8g2.drawUTF8(0, y_start + 2, menu_entry_list[destination_state.position].name);
 
-    u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
+	u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
 
 	switch (submenu_selected) {
 
@@ -562,20 +562,11 @@ void run_submenu()
 		u8g2.print(" %");
 
 		u8g2.setFont(u8g2_font_helvR18_te);
-		u8g2.setCursor(0, 38);
+		u8g2.setCursor(4, 38);
 		u8g2.print("O₂");
 		u8g2.setCursor(x_gap, 38);
 		u8g2.print(O2_fraction * 100, 1);
 		u8g2.print(" %");
-        u8g2.setFont(u8g2_font_helvR18_te);
-
-        x_gap = 46;
-
-        u8g2.setCursor(4, 38);
-        u8g2.print("O₂");
-        u8g2.setCursor(x_gap, 38);
-        u8g2.print(O2_fraction * 100, 1);
-        u8g2.print(" %");
 
 		u8g2.setCursor(4, u8g2.getDisplayHeight());
 		u8g2.print("He");
