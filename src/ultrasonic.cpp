@@ -13,7 +13,7 @@
 // Ultrasonic Sensor Setup
 const int trigPin = 19;  // Single Trigger pin for both ultrasonic sensors
 const int echoPin0 = 18; // Echo pin for each ultrasonic sensors
-const int echoPin1 = 17; // Echo pin for each ultrasonic sensors
+// const int echoPin1 = 17; // Echo pin for each ultrasonic sensors
 
 double measure_duration();
 
@@ -26,7 +26,7 @@ int ultrasonic_Initialise()
     // establish pins
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin0, INPUT);
-    pinMode(echoPin1, INPUT);
+//     pinMode(echoPin1, INPUT);
 
     RA_dur.clear();
 
@@ -55,17 +55,17 @@ double measure_duration()
     double duration0 = pulseIn(echoPin0, HIGH);
     RA_dur.addValue(duration0);
 
-    // Clear the trigger pin
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
+//     // Clear the trigger pin
+//     digitalWrite(trigPin, LOW);
+//     delayMicroseconds(2);
 
-    // Send a 10 microsecond pulse to trigger the sensor
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
+//     // Send a 10 microsecond pulse to trigger the sensor
+//     digitalWrite(trigPin, HIGH);
+//     delayMicroseconds(10);
+//     digitalWrite(trigPin, LOW);
 
-    double duration1 = pulseIn(echoPin1, HIGH);
-    RA_dur.addValue(duration1);
+//     double duration1 = pulseIn(echoPin1, HIGH);
+//     RA_dur.addValue(duration1);
 
     return RA_dur.getAverage() / 1000000;
 }

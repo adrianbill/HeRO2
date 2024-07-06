@@ -532,11 +532,11 @@ void run_submenu()
 
     u8g2.clearBuffer();
 
-    u8g2.setFont(u8g2_font_helvB10_te);
+    u8g2.setFont(u8g2_font_helvR10_te);
 
     u8g2.drawUTF8(0, y_start + 2, menu_entry_list[destination_state.position].name);
 
-    u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+    u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
 
     switch (submenu_selected)
     {
@@ -606,15 +606,15 @@ void run_submenu()
 
         u8g2.setFont(u8g2_font_helvR18_te);
 
-        x_gap = 42;
+        x_gap = 46;
 
-        u8g2.setCursor(0, 38);
+        u8g2.setCursor(4, 38);
         u8g2.print("O₂");
         u8g2.setCursor(x_gap, 38);
         u8g2.print(O2_fraction * 100, 1);
         u8g2.print(" %");
 
-        u8g2.setCursor(0, u8g2.getDisplayHeight());
+        u8g2.setCursor(4, u8g2.getDisplayHeight());
         u8g2.print("He");
         u8g2.setCursor(x_gap, u8g2.getDisplayHeight());
         u8g2.print(He_fraction * 100, 1);
@@ -631,9 +631,9 @@ void run_submenu()
         relative_humidity = humidity_measurement(); // fraction
         local_pressure = atmpressure_measurement(); // kPa
 
-        u8g2.setFont(u8g2_font_helvB12_te);
+        u8g2.setFont(u8g2_font_helvR12_te);
 
-        x_gap = u8g2.getStrWidth("R.Hum") + 4;
+        x_gap = u8g2.getStrWidth("R.Hum") + 3;
 
         u8g2.setCursor(0, 31);
         u8g2.print("Temp");
@@ -722,7 +722,7 @@ void run_submenu()
         u8g2.print(" / ");
         u8g2.print(He_fraction_last * 100, 0);
 
-        u8g2.setFont(u8g2_font_helvB10_te);
+        u8g2.setFont(u8g2_font_helvR10_te);
 
         u8g2.drawUTF8(0, y_start + 2, "MOD pO₂");
 
@@ -766,7 +766,7 @@ void run_submenu()
         u8g2.print(" / ");
         u8g2.print(He_fraction_last * 100, 0);
 
-        u8g2.setFont(u8g2_font_helvB10_te);
+        u8g2.setFont(u8g2_font_helvR10_te);
 
         u8g2.drawUTF8(0, y_start + 2, "MOD Den");
 
@@ -930,8 +930,8 @@ void splash_screen_cal()
     u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
     u8g2.print("gas analyser");
 
-    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating Dist")) / 2, u8g2.getDisplayHeight() - 4);
-    u8g2.print("Calibrating Dist");
+    u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating Dist.")) / 2, u8g2.getDisplayHeight() - 4);
+    u8g2.print("Calibrating Dist.");
 
     u8g2.sendBuffer();
 
