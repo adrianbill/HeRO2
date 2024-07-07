@@ -19,8 +19,7 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 MUIU8G2 mui;
 
 // Menu element struct definition
-struct menu_entry_type
-{
+struct menu_entry_type {
     const uint8_t *font;
     uint16_t icon0;
     uint16_t icon1;
@@ -28,17 +27,15 @@ struct menu_entry_type
 };
 
 // Menu state struct definition
-struct menu_state
-{
+struct menu_state {
     int16_t menu_start;     /* in pixel */
     int16_t frame_position; /* in pixel */
     uint8_t position;       /* position, array index */
 };
 
-enum View
-{
-    MAIN_MENU,
-    SUB_MENU
+enum View {
+        MAIN_MENU,
+        SUB_MENU
 };
 
 // Menu Icon configuration
@@ -60,37 +57,18 @@ enum View
 struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
 struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
 
-
-
+//button and menu tracking
 int8_t button_event = 0; // set this to 0, once the event has been processed
 uint8_t calib_page_exit_code = 0; // set to 0, returns to main menu
-
-View current_view = MAIN_MENU;
 uint32_t submenu_selected = 0;
 uint8_t is_redraw = 1;
+View current_view = MAIN_MENU;
 
 // Save last sensor readings
 double temperature_k_last = 0;
 double O2_fraction_last = 0;
 double He_fraction_last = 0;
 double H2O_fraction_last = 0;
-
-// Functions
-int menu_initialise();
-void check_button_event();
-void draw_main(struct menu_state *state);
-void to_right(struct menu_state *state);
-void to_left(struct menu_state *state);
-uint8_t towards_int16(int16_t *current, int16_t dest);
-uint8_t towards(struct menu_state *current, struct menu_state *destination);
-void run_menu();
-void navigate_menu();
-void run_submenu();
-void navigate_submenu();
-void calibrate_run_display();
-void dist_calibrate_run_display();
-void splash_screen();
-void splash_screen_cal();
 
 // Main Menu items
 // {font, icon character 1, icon character 2, Title} second icon character used for O2 & He elements
@@ -165,7 +143,24 @@ fds_t fds_data[] =
         MUI_XYAT("EX", 32, 58, 2, " cal ")
         MUI_XYAT("BA", 96, 58, 3, " back ");
 
-// END mui Menu elements
+// Functions
+int menu_initialise();
+void check_button_event();
+void draw_main(struct menu_state *state);
+void to_right(struct menu_state *state);
+void to_left(struct menu_state *state);
+uint8_t towards_int16(int16_t *current, int16_t dest);
+uint8_t towards(struct menu_state *current, struct menu_state *destination);
+void run_menu();
+void navigate_menu();
+void run_submenu();
+void navigate_submenu();
+void calibrate_run_display();
+void dist_calibrate_run_display();
+void splash_screen();
+void splash_screen_cal();
+void submenu_draw();
+
 
 void setup()
 {
@@ -201,13 +196,11 @@ void setup()
                 delay(500);
         }
 
-        // // helium initialization
+        // helium initialization
         He_Initialise();
 
         splash_screen_cal();
-
         run_menu();
-
         Serial.println("Ready");
 }
 
@@ -399,7 +392,7 @@ void navigate_menu()
 void navigate_submenu()
 {
         if (button_event == U8X8_MSG_GPIO_MENU_SELECT && submenu_selected > 0)
-                        submenu_selected = submenu_selected * 10;
+                submenu_selected = submenu_selected * 10;
         if (button_event > 0)
                 button_event = 0;
 }
