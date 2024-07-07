@@ -21,3 +21,9 @@ double O2_cal_target = 0.209;
 double O2_calibration = 0.0;
 double dist_calibration_target = 0.0;
 double distance_calibrated = 0.0517;
+
+// Save last sensor readings
+double temperature_k_last = 0;
+double O2_fraction_last = 0;
+double He_fraction_last = 0;
+double H2O_fraction_last = 0;

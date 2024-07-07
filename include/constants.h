@@ -22,4 +22,10 @@ extern double O2_calibration;
 extern double dist_calibration_target;
 extern double distance_calibrated;
 
+// Save last sensor readings
+extern double temperature_k_last;
+extern double O2_fraction_last;
+extern double He_fraction_last;
+extern double H2O_fraction_last;
+
 #endif

@@ -15,6 +15,7 @@
 #include "ultrasonic.h"  // ultrasonic measurement
 #include "helium.h"      // helium calculations
 
+//setup display and mui menus
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 MUIU8G2 mui;
 
@@ -59,16 +60,20 @@ struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
 
 //button and menu tracking
 int8_t button_event = 0; // set this to 0, once the event has been processed
-uint8_t calib_page_exit_code = 0; // set to 0, returns to main menu
+uint8_t calib_page_exit_code = 0;
 uint32_t submenu_selected = 0;
 uint8_t is_redraw = 1;
 View current_view = MAIN_MENU;
 
-// Save last sensor readings
-double temperature_k_last = 0;
-double O2_fraction_last = 0;
-double He_fraction_last = 0;
-double H2O_fraction_last = 0;
+// mui O2 calibration inputs
+uint8_t O2_calibration_target_ten = 2;
+uint8_t O2_calibration_target_one = 0;
+uint8_t O2_calibration_target_dec = 9;
+
+// mui distance calibration inputs
+uint8_t dist_calibration_target_ten = 0;
+uint8_t dist_calibration_target_one = 0;
+uint8_t dist_calibration_target_dec = 0;
 
 // Main Menu items
 // {font, icon character 1, icon character 2, Title} second icon character used for O2 & He elements
@@ -81,15 +86,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
         {NULL, 0, 0, NULL}
 };
 
-// mui O2 calibration inputs
-uint8_t O2_calibration_target_ten = 2;
-uint8_t O2_calibration_target_one = 0;
-uint8_t O2_calibration_target_dec = 9;
 
-// mui O2 calibration inputs
-uint8_t dist_calibration_target_ten = 0;
-uint8_t dist_calibration_target_one = 0;
-uint8_t dist_calibration_target_dec = 0;
 
 muif_t muif_list[] = {
         MUIF_U8G2_FONT_STYLE(0, u8g2_font_helvR12_te), /* regular font */
@@ -155,11 +152,12 @@ void run_menu();
 void navigate_menu();
 void run_submenu();
 void navigate_submenu();
-void calibrate_run_display();
+void O2_calibrate_run_display();
 void dist_calibrate_run_display();
 void splash_screen();
 void splash_screen_cal();
 void submenu_draw();
+void submenu_cases();
 
 
 void setup()
@@ -208,61 +206,10 @@ void loop()
 {
         check_button_event();
 
-        if (mui.isFormActive()) {
-                if (is_redraw) {
-                        u8g2.clearBuffer();
-                        u8g2.setFont(u8g2_font_helvB10_te);
-                        u8g2.drawUTF8(0, 12, menu_entry_list[destination_state.position].name);
-                        u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
-                        mui.draw();
-                        u8g2.sendBuffer();
-                        is_redraw = 0;
-                }
-                switch (u8g2.getMenuEvent()) {
-                case U8X8_MSG_GPIO_MENU_SELECT:
-                        mui.sendSelect();
-                        is_redraw = 1;
-                        break;
-                case U8X8_MSG_GPIO_MENU_NEXT:
-                        mui.nextField();
-                        is_redraw = 1;
-                        break;
-                case U8X8_MSG_GPIO_MENU_PREV:
-                        mui.prevField();
-                        is_redraw = 1;
-                        break;
-                } 
-        } else {
-                switch (calib_page_exit_code) {
-                case 1:
-                        O2_cal_target = (O2_calibration_target_ten * 0.1) + (O2_calibration_target_one * 0.01) + (O2_calibration_target_dec * 0.001);
-                        calibrate_run_display();
-                        submenu_selected = 0;
-                        calib_page_exit_code = 0;
-                        button_event = 0;
-                        break;
-                case 2:
-                        dist_calibration_target = (dist_calibration_target_ten * 0.1) + (dist_calibration_target_one * 0.01) + (dist_calibration_target_dec * 0.001);
-                        dist_calibrate_run_display();
-                        submenu_selected = 0;
-                        calib_page_exit_code = 0;
-                        button_event = 0;
-                        break;
-                case 3:
-                        submenu_selected = 0;
-                        calib_page_exit_code = 0;
-                        button_event = 0;
-                        break;
-                default:
-                        break;
-                }
-                if (submenu_selected) {
-                        run_submenu();
-                        navigate_submenu();
-                } else {
-                        run_menu();
-                }
-        }
+        if (mui.isFormActive())
+                submenu_draw();
+        else 
+                submenu_cases();
 }
 
 // Functions
@@ -583,6 +530,7 @@ void run_submenu()
 
                 break;
         // MOD PO2 Screen
+        case 20:
         case 10:
                 check_button_event();
 
@@ -618,10 +566,8 @@ void run_submenu()
                 u8g2.print(" m");
 
                 break;
-        case 20:
-                submenu_selected = 10;
-                break;
         // MOD Density Screen
+        case 200:
         case 100:
                 check_button_event();
 
@@ -657,9 +603,6 @@ void run_submenu()
                 u8g2.print(" m");
                 
                 break;
-        case 200:
-                submenu_selected = 100;
-                break;
         default:
                 submenu_selected = 0;
                 break;
@@ -670,7 +613,7 @@ void run_submenu()
         check_button_event();
 }
 
-void calibrate_run_display()
+void O2_calibrate_run_display()
 {
         u8g2.clearBuffer();
 
@@ -763,17 +706,14 @@ void splash_screen_cal()
 
         Serial.println("Calibrating O₂");
 
-        u8g2.setFont(u8g2_font_helvR24_te);
-
         u8g2.clearBuffer();
-
+        u8g2.setFont(u8g2_font_helvR24_te);
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
         u8g2.print("HeRO₂");
 
         u8g2.setFont(u8g2_font_helvR10_te);
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
         u8g2.print("gas analyser");
-
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating O")) / 2, u8g2.getDisplayHeight() - 4);
         u8g2.print("Calibrating O₂");
 
@@ -783,17 +723,14 @@ void splash_screen_cal()
 
         Serial.println("Calibrating Distance");
 
-        u8g2.setFont(u8g2_font_helvR24_te);
-
         u8g2.clearBuffer();
-
+        u8g2.setFont(u8g2_font_helvR24_te);
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
         u8g2.print("HeRO₂");
 
         u8g2.setFont(u8g2_font_helvR10_te);
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
         u8g2.print("gas analyser");
-
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating Dist.")) / 2, u8g2.getDisplayHeight() - 4);
         u8g2.print("Calibrating Dist.");
 
@@ -802,6 +739,67 @@ void splash_screen_cal()
         delay(1500);
 
         calibrate_distance(dist_calibration_target, oxygen_measurement(), water_measurement());
+}
+
+// Menu redraws
+void submenu_draw()
+{
+        if (is_redraw) {
+                u8g2.clearBuffer();
+                u8g2.setFont(u8g2_font_helvB10_te);
+                u8g2.drawUTF8(0, 12, menu_entry_list[destination_state.position].name);
+                u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
+                mui.draw();
+                u8g2.sendBuffer();
+                is_redraw = 0;
+        }
+        switch (u8g2.getMenuEvent()) {
+        case U8X8_MSG_GPIO_MENU_SELECT:
+                mui.sendSelect();
+                is_redraw = 1;
+                break;
+        case U8X8_MSG_GPIO_MENU_NEXT:
+                mui.nextField();
+                is_redraw = 1;
+                break;
+        case U8X8_MSG_GPIO_MENU_PREV:
+                mui.prevField();
+                is_redraw = 1;
+                break;
+        } 
+}
+
+void submenu_cases()
+{
+        switch (calib_page_exit_code) {
+        case 1:
+                O2_cal_target = (O2_calibration_target_ten * 0.1) + (O2_calibration_target_one * 0.01) + (O2_calibration_target_dec * 0.001);
+                O2_calibrate_run_display();
+                submenu_selected = 0;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        case 2:
+                dist_calibration_target = (dist_calibration_target_ten * 0.1) + (dist_calibration_target_one * 0.01) + (dist_calibration_target_dec * 0.001);
+                dist_calibrate_run_display();
+                submenu_selected = 0;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        case 3:
+                submenu_selected = 0;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        default:
+                break;
+        }
+
+        if (submenu_selected) {
+                run_submenu();
+                navigate_submenu();
+        } else 
+                run_menu();
 }
 
 
