@@ -12,8 +12,7 @@
 #include "constants.h"   // Global Constants
 #include "oxygen.h"      // oxygen calculations
 #include "environment.h" // environmenttal parameters: temperature, humidity, atmospheric pressure
-#include "ultrasonic.h"  // ultrasonic measurement
-#include "helium.h"      // helium calculations
+#include "helium.h"      // ultrasonic measurement and helium calculations
 
 //setup display and mui menus
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
@@ -185,12 +184,6 @@ void setup()
         // Oxygen sensor Initialise
         if (O2_Initialise()) {
                 Serial.println("ADC Connected");
-                delay(500);
-        }
-
-        // // Ultrasonic initialise
-        if (ultrasonic_Initialise()) {
-                Serial.println("Ultrasonic Connected");
                 delay(500);
         }
 

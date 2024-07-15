@@ -20,7 +20,7 @@ RunningAverage RA_O2_measure(100);
 RunningAverage RA_O2_calibration(100);
 
 // Initialises Analog to Digital Converter for O2 Sensor and clear running average
-int O2_Initialise()
+int O2_Initialise(void)
 {
         if (!ads.begin()) {
                 Serial.println("Failed to initialize ADS.");
@@ -36,7 +36,7 @@ int O2_Initialise()
 }
 
 // Function to calibration Oxygen
-void calibrate_oxygen()
+void calibrate_oxygen(void)
 {
         RA_O2_calibration.clear();
 
@@ -52,7 +52,7 @@ void calibrate_oxygen()
 }
 
 // Function to measure Oxygen
-double oxygen_measurement()
+double oxygen_measurement(void)
 {
         double voltage_meas_mV = oxygen_millivolts();
 
@@ -60,7 +60,7 @@ double oxygen_measurement()
 }
 
 // Function to return O2 millivolts
-double oxygen_millivolts()
+double oxygen_millivolts(void)
 {
         RA_O2_measure.addValue(ads.readADC_Differential_0_1());
 

@@ -16,7 +16,7 @@ RunningAverage RA_humidity(100);
 RunningAverage RA_pressure(100);
 
 // Initialize HTU21D sensor and clear running averages
-int Environment_Initialise()
+int Environment_Initialise(void)
 {
         if (!bme.begin()) {
                 Serial.println("Could not find BME280 sensor!");
@@ -32,7 +32,7 @@ int Environment_Initialise()
 }
 
 // Temperature Measurement Function in Kelvin
-double temperature_measurement()
+double temperature_measurement(void)
 {
         double temp_measure = bme.temp() + 273.15;
         RA_temperature.addValue(temp_measure);
@@ -41,7 +41,7 @@ double temperature_measurement()
 }
 
 // Relative Humidity Measurement Function
-double humidity_measurement()
+double humidity_measurement(void)
 {
         double hum_measure = bme.hum() / 100;
         RA_humidity.addValue(hum_measure);
@@ -50,7 +50,7 @@ double humidity_measurement()
 }
 
 // Atmospheric Pressure Measurement Function in kPa
-double atmpressure_measurement()
+double atmpressure_measurement(void)
 {
         double pressure_total = bme.pres() / 10; // reads pressure in hPa and converts to kPa
         RA_pressure.addValue(pressure_total);
@@ -59,7 +59,7 @@ double atmpressure_measurement()
 }
 
 // Function to calculate the fraction of water in gas using relative humidity using Tetens equation
-double water_measurement()
+double water_measurement(void)
 {
         double temperature_C = temperature_measurement() - 273.15;
         double humidity = humidity_measurement();
