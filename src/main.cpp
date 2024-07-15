@@ -136,26 +136,27 @@ fds_t fds_data[] =
         MUI_XYAT("BA", 104, 58, 3, " back ");
 
 // Functions
-int menu_initialise();
+int menu_initialise(void);
 void check_button_event();
 void draw_main(struct menu_state *state);
 void to_right(struct menu_state *state);
 void to_left(struct menu_state *state);
 uint8_t towards_int16(int16_t *current, int16_t dest);
 uint8_t towards(struct menu_state *current, struct menu_state *destination);
-void run_menu();
-void navigate_menu();
-void run_submenu();
-void navigate_submenu();
-void O2_calibrate_run_display();
-void dist_calibrate_run_display();
-void splash_screen();
-void splash_screen_cal();
-void submenu_draw();
-void submenu_cases();
+void run_menu(void);
+void navigate_menu(void);
+void run_submenu(void);
+void navigate_submenu(void);
+void O2_calibrate_run_display(void);
+void dist_calibrate_run_display(void);
+void splash_screen(void);
+void splash_screen_cal(void);
+void load_calibration_values(void);
+void submenu_draw(void);
+void submenu_cases(void);
 
 
-void setup()
+void setup(void)
 {
         // start serial connection
         Serial.begin(115200);
@@ -196,23 +197,16 @@ void setup()
                 delay(500);
         }
 
-        // O2_calibration = EEPROM.readDouble(eeprom_O2_address);
-        // distance_calibrated = EEPROM.readDouble(eeprom_dist_address);
-
         // splash_screen_cal();
 
-        Serial.print("O2 eeprom: ");
-        Serial.println(EEPROM.readDouble(eeprom_O2_address), 8);
-
-        Serial.print("Dist eeprom: ");
-        Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
+        load_calibration_values();
 
         run_menu();
         
         Serial.println("Ready");
 }
 
-void loop()
+void loop(void)
 {
         check_button_event();
 
@@ -224,7 +218,7 @@ void loop()
 
 // Functions
 
-int menu_initialise()
+int menu_initialise(void)
 {
         if (!u8g2.begin(select_pin, next_pin, prev_pin)) {
                 Serial.println("Failed to initialize display.");
@@ -239,7 +233,7 @@ int menu_initialise()
         return 1;
 }
 
-void check_button_event()
+void check_button_event(void)
 {
         if (button_event == 0) 
                 button_event = u8g2.getMenuEvent();
@@ -304,7 +298,7 @@ void draw_main(struct menu_state *state)
 }
 
 // new run_menu
-void run_menu()
+void run_menu(void)
 {
         do {
                 u8g2.clearBuffer();
@@ -331,7 +325,7 @@ void run_menu()
         } while (towards(&current_state, &destination_state));
 }
 
-void navigate_menu()
+void navigate_menu(void)
 {
         if (button_event == U8X8_MSG_GPIO_MENU_NEXT)
                 to_right(&destination_state);
@@ -346,7 +340,7 @@ void navigate_menu()
                 button_event = 0;
 }
 
-void navigate_submenu()
+void navigate_submenu(void)
 {
         if (button_event == U8X8_MSG_GPIO_MENU_SELECT && submenu_selected > 0)
                 submenu_selected = submenu_selected * 10;
@@ -355,7 +349,7 @@ void navigate_submenu()
 }
 
 // new run_submenu
-void run_submenu()
+void run_submenu(void)
 {
         check_button_event();
 
@@ -623,7 +617,7 @@ void run_submenu()
         check_button_event();
 }
 
-void O2_calibrate_run_display()
+void O2_calibrate_run_display(void)
 {
         u8g2.clearBuffer();
 
@@ -655,7 +649,7 @@ void O2_calibrate_run_display()
         delay(1500);
 }
 
-void dist_calibrate_run_display()
+void dist_calibrate_run_display(void)
 {
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_helvB10_te);
@@ -688,7 +682,7 @@ void dist_calibrate_run_display()
         delay(1500);
 }
 
-void splash_screen()
+void splash_screen(void)
 {
         int y_start = 33;
 
@@ -710,7 +704,7 @@ void splash_screen()
         u8g2.sendBuffer();
 }
 
-void splash_screen_cal()
+void splash_screen_cal(void)
 {
         int y_start = 33;
 
@@ -751,8 +745,20 @@ void splash_screen_cal()
         calibrate_distance(dist_calibration_target, oxygen_measurement(), water_measurement());
 }
 
+void load_calibration_values(void)
+{      
+        O2_calibration = EEPROM.readDouble(eeprom_O2_address);
+        distance_calibrated = EEPROM.readDouble(eeprom_dist_address);
+
+        Serial.print("O2 eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_O2_address), 8);
+
+        Serial.print("Dist eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
+}
+
 // Menu redraws
-void submenu_draw()
+void submenu_draw(void)
 {
         if (is_redraw) {
                 u8g2.clearBuffer();
@@ -779,7 +785,7 @@ void submenu_draw()
         } 
 }
 
-void submenu_cases()
+void submenu_cases(void)
 {
         switch (calib_page_exit_code) {
         case 1:

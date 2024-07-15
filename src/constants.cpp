@@ -18,9 +18,9 @@ extern constexpr double H2O_molar_mass{0.01802};
 
 // calibration values
 double O2_cal_target = 0.209;
-double O2_calibration = 0.0;
+double O2_calibration;
 double dist_calibration_target = 0.0;
-double distance_calibrated = 0.09764762;
+double distance_calibrated;
 
 // Save last sensor readings
 double temperature_k_last = 0;
