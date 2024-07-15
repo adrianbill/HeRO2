@@ -190,7 +190,7 @@ void setup()
         // helium initialization
         He_Initialise();
 
-        splash_screen_cal();
+        // splash_screen_cal();
         run_menu();
         Serial.println("Ready");
 }
