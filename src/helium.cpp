@@ -2,6 +2,7 @@
 #include <Arduino.h>	    // Basic Library
 #include <RunningAverage.h> // Running Average Library
 #include <math.h>	    // Math Library
+#include "EEPROM.h"
 
 // Custom Headers
 #include "constants.h"
@@ -9,12 +10,6 @@
 
 // Paired Header
 #include "helium.h"
-
-// Ultrasonic Sensor Setup
-const int trigPin = 19;	 // Single Trigger pin for both ultrasonic sensors
-const int echoPin0 = 18; // Echo pin for first ultrasonic sensors
-// const int echoPin1 = 17; // Echo pin for second ultrasonic sensors (not used in current version)
-
 
 // Running Average Setup
 RunningAverage RA_dur(100);
@@ -112,7 +107,15 @@ void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fract
 
         distance_calibrated = speed_of_sound_calculated * duration;
 
+        EEPROM.writeDouble(eeprom_dist_address, distance_calibrated);
+        EEPROM.commit();
+
         Serial.println("Dist Calibrated");
+
+        Serial.print("Value: ");
+        Serial.print(distance_calibrated, 8);
+        Serial.print(" | eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
 }
 
 //  New function to trigger helium reading under development

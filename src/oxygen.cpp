@@ -4,6 +4,7 @@
 #include <RunningAverage.h> // Running Average Library
 #include <Wire.h>	    // I2C Library
 #include <math.h>	    // Math Library
+#include "EEPROM.h"
 
 // Custom Headers
 #include "constants.h"
@@ -48,7 +49,15 @@ void calibrate_oxygen(void)
 
         O2_calibration = O2_cal_target / voltage_meas_mV;
 
+        EEPROM.writeDouble(eeprom_O2_address, O2_calibration);
+        EEPROM.commit();
+
         Serial.println("O₂ Calibrated");
+        
+        Serial.print("Value: ");
+        Serial.print(O2_calibration, 8);
+        Serial.print(" | eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_O2_address), 8);
 }
 
 // Function to measure Oxygen

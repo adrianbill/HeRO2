@@ -28,4 +28,18 @@ extern double O2_fraction_last;
 extern double He_fraction_last;
 extern double H2O_fraction_last;
 
+extern int eeprom_size;
+extern int eeprom_O2_address;
+extern int eeprom_dist_address;
+
+// Ultrasonic Sensor Setup
+extern const int trigPin; // Single Trigger pin for both ultrasonic sensors
+extern const int echoPin0; // Echo pin for first ultrasonic sensors
+// extern const int echoPin1; // Echo pin for second ultrasonic sensors (not used in current version)
+
+// Navigation Button pin configuration
+extern const int next_pin;
+extern const int select_pin;
+extern const int prev_pin;
+
 #endif

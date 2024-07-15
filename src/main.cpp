@@ -7,6 +7,7 @@
 #include <BME280I2C.h>      // Temp/Hum/Pres sensor Library
 #include <ADS1X15.h>        // ADC / Amplifier Library
 #include <RunningAverage.h> // Running Average Library
+#include "EEPROM.h"
 
 // Custom Headers
 #include "constants.h"   // Global Constants
@@ -48,11 +49,6 @@ enum View {
 #define ICON_W_2nd_Letter 27
 #define ELEMENTS 6 // number of elements in menu + null element
 
-// Navigation Button pin configuration
-#define NEXT_PIN 25
-#define SELECT_PIN 26
-#define PREV_PIN 27
-
 // menu initial states
 struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
 struct menu_state destination_state = {ICON_BGAP, ICON_BGAP, 0};
@@ -89,7 +85,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
 
 muif_t muif_list[] = {
         MUIF_U8G2_FONT_STYLE(0, u8g2_font_helvR12_te), /* regular font */
-        MUIF_U8G2_FONT_STYLE(1, u8g2_font_helvR10_te), /* bold font */
+        MUIF_U8G2_FONT_STYLE(1, u8g2_font_helvR08_te), /* bold font */
 
         MUIF_U8G2_LABEL(),
 
@@ -124,8 +120,8 @@ fds_t fds_data[] =
         MUI_XY("CC", 95, 34)
         MUI_LABEL(105, 34, " %")
         MUI_STYLE(1)
-        MUI_XYAT("EX", 32, 58, 1, " cal ")
-        MUI_XYAT("BA", 96, 58, 3, " back ")
+        MUI_XYAT("EX", 32, 58, 1, " calibrate ")
+        MUI_XYAT("BA", 104, 58, 3, " back ")
 
         MUI_FORM(2)
         MUI_STYLE(0)
@@ -136,8 +132,8 @@ fds_t fds_data[] =
         MUI_XY("DC", 95, 34)
         MUI_LABEL(105, 34, " %")
         MUI_STYLE(1)
-        MUI_XYAT("EX", 32, 58, 2, " cal ")
-        MUI_XYAT("BA", 96, 58, 3, " back ");
+        MUI_XYAT("EX", 32, 58, 2, " calibrate ")
+        MUI_XYAT("BA", 104, 58, 3, " back ");
 
 // Functions
 int menu_initialise();
@@ -165,6 +161,13 @@ void setup()
         Serial.begin(115200);
         delay(1000); // Delay to stabilize serial communication
 
+          if (!EEPROM.begin(eeprom_size)) {
+                Serial.println("Failed to initialize EEPROM");
+                Serial.println("Restarting...");
+                delay(1000);
+                ESP.restart();
+        }    
+
         // Initialise I2C
         Wire.begin();
 
@@ -187,11 +190,25 @@ void setup()
                 delay(500);
         }
 
-        // helium initialization
-        He_Initialise();
+        // Oxygen sensor Initialise
+        if (He_Initialise()) {
+                Serial.println("Ultrasonic Connected");
+                delay(500);
+        }
+
+        // O2_calibration = EEPROM.readDouble(eeprom_O2_address);
+        // distance_calibrated = EEPROM.readDouble(eeprom_dist_address);
 
         // splash_screen_cal();
+
+        Serial.print("O2 eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_O2_address), 8);
+
+        Serial.print("Dist eeprom: ");
+        Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
+
         run_menu();
+        
         Serial.println("Ready");
 }
 
@@ -209,7 +226,7 @@ void loop()
 
 int menu_initialise()
 {
-        if (!u8g2.begin(SELECT_PIN, NEXT_PIN, PREV_PIN)) {
+        if (!u8g2.begin(select_pin, next_pin, prev_pin)) {
                 Serial.println("Failed to initialize display.");
                 while (1)
                         ;
