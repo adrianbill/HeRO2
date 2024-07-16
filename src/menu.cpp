@@ -648,47 +648,6 @@ void splash_screen(void)
         u8g2.sendBuffer();
 }
 
-void splash_screen_cal(void)
-{
-        int y_start = 33;
-
-        Serial.println("Calibrating O₂");
-
-        u8g2.clearBuffer();
-        u8g2.setFont(u8g2_font_helvR24_te);
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
-        u8g2.print("HeRO₂");
-
-        u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
-        u8g2.print("gas analyser");
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating O")) / 2, u8g2.getDisplayHeight() - 4);
-        u8g2.print("Calibrating O₂");
-
-        u8g2.sendBuffer();
-
-        calibrate_oxygen();
-
-        Serial.println("Calibrating Distance");
-
-        u8g2.clearBuffer();
-        u8g2.setFont(u8g2_font_helvR24_te);
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
-        u8g2.print("HeRO₂");
-
-        u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("gas analyser")) / 2, y_start + 11);
-        u8g2.print("gas analyser");
-        u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("Calibrating Dist.")) / 2, u8g2.getDisplayHeight() - 4);
-        u8g2.print("Calibrating Dist.");
-
-        u8g2.sendBuffer();
-
-        delay(1500);
-
-        calibrate_distance(dist_calibration_target, oxygen_measurement(), water_measurement());
-}
-
 void load_calibration_values(void)
 {      
         O2_calibration = EEPROM.readDouble(eeprom_O2_address);
