@@ -15,7 +15,6 @@ void navigate_submenu(void);
 void O2_calibrate_run_display(void);
 void dist_calibrate_run_display(void);
 void splash_screen(void);
-void splash_screen_cal(void);
 void load_calibration_values(void);
 void submenu_draw(void);
 void submenu_cases(void);

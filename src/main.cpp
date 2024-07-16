@@ -57,8 +57,6 @@ void setup(void)
                 delay(500);
         }
 
-        // splash_screen_cal();
-
         load_calibration_values();
 
         delay(1500);
