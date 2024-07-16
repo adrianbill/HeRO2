@@ -28,6 +28,7 @@ extern double O2_fraction_last;
 extern double He_fraction_last;
 extern double H2O_fraction_last;
 
+//eeprom parameters for saving values across restarts
 extern int eeprom_size;
 extern int eeprom_O2_address;
 extern int eeprom_dist_address;
