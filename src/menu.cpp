@@ -151,6 +151,11 @@ int menu_initialise(void)
         return 1;
 }
 
+int mui_active(void)
+{
+    return mui.isFormActive(); 
+}
+
 void check_button_event(void)
 {
         if (button_event == 0) 
@@ -694,11 +699,6 @@ void load_calibration_values(void)
 
         Serial.print("Dist eeprom: ");
         Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
-}
-
-int mui_active(void)
-{
-    return mui.isFormActive(); 
 }
 
 // Menu redraws
