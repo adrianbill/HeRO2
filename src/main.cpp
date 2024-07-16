@@ -77,5 +77,3 @@ void loop(void)
         else 
                 submenu_cases();
 }
-
-// Functions
