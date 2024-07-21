@@ -25,12 +25,12 @@ To complete
 
 - **buttons**
   - next: pin 1
-  - select: pin 2
-  - prev: pin 3
+  - select: pin 4
+  - prev: pin 6
 - **I2C**
   - SDA: pin 8
   - SLC: pin 9
 - **Ultrasonic**
-  - trigger: pin 14
-  - echo0: pin 15
+  - trigger: pin 11
+  - echo0: pin 10
   - echo1: pin 16 (if needed)

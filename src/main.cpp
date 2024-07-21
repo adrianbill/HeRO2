@@ -30,7 +30,8 @@ void setup(void)
         }  
 
         // Initialise I2C
-        Wire.begin();
+        Wire.begin(sda_pin, scl_pin);
+
 
         // buttons and display Initialise
         if (menu_initialise()) {
@@ -40,8 +41,8 @@ void setup(void)
         }
 
         // Temperature, Relative Humidity, and pressure Sensor Initialise
-        if (Environment_Initialise()) {
-                Serial.println("Environment Connected");
+        if (!Environment_Initialise()) {
+                Serial.println("Environment not connected");
                 delay(500);
         }
 

@@ -95,7 +95,7 @@ double measure_duration(void)
 double speed_measurement(void)
 {
         double duration = measure_duration();
-        return distance_calibrated / duration; // Calculate the speeds in m/s
+        return EEPROM.readDouble(eeprom_dist_address) / duration; // Calculate the speeds in m/s
 }
 
 // Function to calibrate distance, returns distance in m

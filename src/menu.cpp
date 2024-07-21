@@ -49,7 +49,7 @@ enum View {
 #define ICON_BGAP 5
 #define ICON_Y 32 + ICON_GAP - 4
 #define ICON_W_2nd_Letter 27
-#define ELEMENTS 6 // number of elements in menu + null element
+#define ELEMENTS 7 // number of elements in menu + null element
 
 // menu initial states
 struct menu_state current_state = {ICON_BGAP, ICON_BGAP, 0};
@@ -78,6 +78,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
         {u8g2_font_helvR24_te, 79, 8322, "Oxygen"}, // 79 = "O", 8322 = "₂"
         {u8g2_font_helvR24_te, 72, 101, "Trimix"},  // 72 = "H", 101 = "e"
         {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibrate"},
+        {u8g2_font_open_iconic_mime_4x_t, 70, 0, "MOD Tbls"},        
         {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Climate"},
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
         {NULL, 0, 0, NULL}
@@ -280,7 +281,7 @@ void run_submenu(void)
         int x_gap = 0;
 
         double temperature_K;
-        double  temperature_C;
+        double temperature_C;
         double relative_humidity;
         double local_pressure_kPa;
 
@@ -352,9 +353,12 @@ void run_submenu(void)
                 u8g2.setFont(u8g2_font_helvR08_te);
 
                 u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
-                u8g2.print("H₂O ");
-                u8g2.print(H2O_fraction * 100, 2);
-                u8g2.print(" %");
+                // u8g2.print("H₂O ");
+                // u8g2.print(H2O_fraction * 100, 2);
+                // u8g2.print(" %");
+                u8g2.print("S ");
+                u8g2.print(speed_of_sound_m_s, 1);
+                u8g2.print(" m/s");
 
                 u8g2.setFont(u8g2_font_helvR18_te);
 
@@ -398,8 +402,79 @@ void run_submenu(void)
                 u8g2.print(" mm");
 
                 break;
-        // Environment
+        //MOD Tables
         case 4:
+                check_button_event();
+
+                u8g2.clearBuffer();
+                u8g2.setFont(u8g2_font_helvB08_te);
+                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+                u8g2.print(O2_fraction_last * 100, 0);
+                u8g2.print(" / ");
+                u8g2.print(He_fraction_last * 100, 0);
+
+                u8g2.setFont(u8g2_font_helvR10_te);
+                u8g2.drawUTF8(0, y_start + 2, "MOD pO₂");
+                u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+
+                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+
+                u8g2.setCursor(20, 31);
+                u8g2.print("pO₂ 1.2");
+                u8g2.setCursor(x_gap, 31);
+                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.2));
+                u8g2.print(" m");
+
+                u8g2.setCursor(20, 45);
+                u8g2.print("pO₂ 1.4");
+                u8g2.setCursor(x_gap, 45);
+                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.4));
+                u8g2.print(" m");
+
+                u8g2.setCursor(20, 60);
+                u8g2.print("pO₂ 1.6");
+                u8g2.setCursor(x_gap, 60);
+                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.6));
+                u8g2.print(" m");
+
+                break;
+        case 40:
+                check_button_event();
+
+                u8g2.clearBuffer();
+                u8g2.setFont(u8g2_font_helvB08_te);
+                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+                u8g2.print(O2_fraction_last * 100, 0);
+                u8g2.print(" / ");
+                u8g2.print(He_fraction_last * 100, 0);
+
+                u8g2.setFont(u8g2_font_helvR10_te);
+                u8g2.drawUTF8(0, y_start + 2, "MOD Den");
+                u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+
+                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+
+                u8g2.setCursor(20, 31);
+                u8g2.print("5.20 g/l");
+                u8g2.setCursor(x_gap, 31);
+                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.2));
+                u8g2.print(" m");
+
+                u8g2.setCursor(20, 45);
+                u8g2.print("5.75 g/l");
+                u8g2.setCursor(x_gap, 45);
+                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.75));
+                u8g2.print(" m");
+
+                u8g2.setCursor(20, 60);
+                u8g2.print("6.30 g/l");
+                u8g2.setCursor(x_gap, 60);
+                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 6.3));
+                u8g2.print(" m");
+                
+                break;
+        // Environment
+        case 5:
                 temperature_C = temperature_measurement() - 273.15;
                 relative_humidity = humidity_measurement();
                 local_pressure_kPa = atmpressure_measurement();
@@ -431,7 +506,7 @@ void run_submenu(void)
 
                 break;
         // Raw Data
-        case 5:
+        case 6:
                 temperature_C = temperature_measurement() - 273.15;
                 relative_humidity = humidity_measurement();
                 local_pressure_kPa = atmpressure_measurement();
@@ -477,80 +552,80 @@ void run_submenu(void)
         case 30:
                 mui.gotoForm(3, 0);
                 break;
-        // MOD PO2 Screen
-        case 20:
-        case 10:
-                check_button_event();
+        // // MOD PO2 Screen
+        // case 20:
+        // case 10:
+        //         check_button_event();
 
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_helvB08_te);
-                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
-                u8g2.print(O2_fraction_last * 100, 0);
-                u8g2.print(" / ");
-                u8g2.print(He_fraction_last * 100, 0);
+        //         u8g2.clearBuffer();
+        //         u8g2.setFont(u8g2_font_helvB08_te);
+        //         u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+        //         u8g2.print(O2_fraction_last * 100, 0);
+        //         u8g2.print(" / ");
+        //         u8g2.print(He_fraction_last * 100, 0);
 
-                u8g2.setFont(u8g2_font_helvR10_te);
-                u8g2.drawUTF8(0, y_start + 2, "MOD pO₂");
-                u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+        //         u8g2.setFont(u8g2_font_helvR10_te);
+        //         u8g2.drawUTF8(0, y_start + 2, "MOD pO₂");
+        //         u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
-                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+        //         x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
 
-                u8g2.setCursor(20, 31);
-                u8g2.print("pO₂ 1.2");
-                u8g2.setCursor(x_gap, 31);
-                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.2));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 31);
+        //         u8g2.print("pO₂ 1.2");
+        //         u8g2.setCursor(x_gap, 31);
+        //         u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.2));
+        //         u8g2.print(" m");
 
-                u8g2.setCursor(20, 45);
-                u8g2.print("pO₂ 1.4");
-                u8g2.setCursor(x_gap, 45);
-                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.4));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 45);
+        //         u8g2.print("pO₂ 1.4");
+        //         u8g2.setCursor(x_gap, 45);
+        //         u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.4));
+        //         u8g2.print(" m");
 
-                u8g2.setCursor(20, 60);
-                u8g2.print("pO₂ 1.6");
-                u8g2.setCursor(x_gap, 60);
-                u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.6));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 60);
+        //         u8g2.print("pO₂ 1.6");
+        //         u8g2.setCursor(x_gap, 60);
+        //         u8g2.print(MOD_O2_calculate(O2_fraction_last, 1.6));
+        //         u8g2.print(" m");
 
-                break;
-        // MOD Density Screen
-        case 200:
-        case 100:
-                check_button_event();
+        //         break;
+        // // MOD Density Screen
+        // case 200:
+        // case 100:
+        //         check_button_event();
 
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_helvB08_te);
-                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
-                u8g2.print(O2_fraction_last * 100, 0);
-                u8g2.print(" / ");
-                u8g2.print(He_fraction_last * 100, 0);
+        //         u8g2.clearBuffer();
+        //         u8g2.setFont(u8g2_font_helvB08_te);
+        //         u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("00 / 00 "), y_start + 2);
+        //         u8g2.print(O2_fraction_last * 100, 0);
+        //         u8g2.print(" / ");
+        //         u8g2.print(He_fraction_last * 100, 0);
 
-                u8g2.setFont(u8g2_font_helvR10_te);
-                u8g2.drawUTF8(0, y_start + 2, "MOD Den");
-                u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
+        //         u8g2.setFont(u8g2_font_helvR10_te);
+        //         u8g2.drawUTF8(0, y_start + 2, "MOD Den");
+        //         u8g2.drawHLine(0, y_start + 4, u8g2.getDisplayWidth());
 
-                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
+        //         x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
 
-                u8g2.setCursor(20, 31);
-                u8g2.print("5.20 g/l");
-                u8g2.setCursor(x_gap, 31);
-                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.2));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 31);
+        //         u8g2.print("5.20 g/l");
+        //         u8g2.setCursor(x_gap, 31);
+        //         u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.2));
+        //         u8g2.print(" m");
 
-                u8g2.setCursor(20, 45);
-                u8g2.print("5.75 g/l");
-                u8g2.setCursor(x_gap, 45);
-                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.75));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 45);
+        //         u8g2.print("5.75 g/l");
+        //         u8g2.setCursor(x_gap, 45);
+        //         u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 5.75));
+        //         u8g2.print(" m");
 
-                u8g2.setCursor(20, 60);
-                u8g2.print("6.30 g/l");
-                u8g2.setCursor(x_gap, 60);
-                u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 6.3));
-                u8g2.print(" m");
+        //         u8g2.setCursor(20, 60);
+        //         u8g2.print("6.30 g/l");
+        //         u8g2.setCursor(x_gap, 60);
+        //         u8g2.print(MOD_density_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, temperature_K_last, 6.3));
+        //         u8g2.print(" m");
                 
-                break;
+        //         break;
         default:
                 submenu_selected = 0;
                 break;

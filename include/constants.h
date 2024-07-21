@@ -33,6 +33,10 @@ extern int eeprom_size;
 extern int eeprom_O2_address;
 extern int eeprom_dist_address;
 
+// I2C Pins
+extern const int sda_pin;
+extern const int scl_pin;
+
 // Ultrasonic Sensor Setup
 extern const int trigPin; // Single Trigger pin for both ultrasonic sensors
 extern const int echoPin0; // Echo pin for first ultrasonic sensors

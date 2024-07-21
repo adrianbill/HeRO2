@@ -28,16 +28,21 @@ double O2_fraction_last = 0;
 double He_fraction_last = 0;
 double H2O_fraction_last = 0;
 
+//eeprom parameters for saving values across restarts
 int eeprom_size = 512;
 int eeprom_O2_address = 0;
 int eeprom_dist_address = 256;
 
+// I2C Pins
+extern constexpr int sda_pin{8};
+extern constexpr int scl_pin{9};
+
 // Ultrasonic Sensor Setup
-extern constexpr int trigPin{19}; // Single Trigger pin for both ultrasonic sensors
-extern constexpr int echoPin0{18}; // Echo pin for first ultrasonic sensors
-// extern constexpr int echoPin1{17}; // Echo pin for second ultrasonic sensors (not used in current version)
+extern constexpr int trigPin{11}; // Single Trigger pin for both ultrasonic sensors
+extern constexpr int echoPin0{10}; // Echo pin for first ultrasonic sensors
+// extern constexpr int echoPin1{16}; // Echo pin for second ultrasonic sensors (not used in current version)
 
 // Navigation Button pin configuration
-extern constexpr int next_pin{25};
-extern constexpr int select_pin{26};
-extern constexpr int prev_pin{27};
+extern constexpr int next_pin{1};
+extern constexpr int select_pin{4};
+extern constexpr int prev_pin{6};
