@@ -78,7 +78,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
         {u8g2_font_helvR24_te, 79, 8322, "Oxygen"}, // 79 = "O", 8322 = "₂"
         {u8g2_font_helvR24_te, 72, 101, "Trimix"},  // 72 = "H", 101 = "e"
         {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibrate"},
-        {u8g2_font_open_iconic_mime_4x_t, 70, 0, "MOD Tbls"},        
+        {u8g2_font_open_iconic_mime_4x_t, 70, 0, "MOD Tables"},        
         {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Climate"},
         {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
         {NULL, 0, 0, NULL}
@@ -134,8 +134,27 @@ fds_t fds_data[] =
         MUI_LABEL(105, 34, " %")
         MUI_STYLE(1)
         MUI_XYAT("EX", 32, 58, 2, " calibrate ")
-        MUI_XYAT("BA", 104, 58, 3, " back ");
+        MUI_XYAT("BA", 104, 58, 3, " back ")
 
+        MUI_FORM(4)
+        MUI_STYLE(0)
+        MUI_LABEL(0, 30, "O₂ ")
+        MUI_XY("CA", 65, 30)
+        MUI_XY("CB", 75, 30)
+        MUI_LABEL(105, 30, " %")
+        MUI_LABEL(0, 45, "He ")
+        MUI_XY("DA", 65, 45)
+        MUI_XY("DB", 75, 45)
+        MUI_LABEL(105, 45, " %")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 64, 58, 4, " MOD Tables ")
+
+        MUI_FORM(5)
+        MUI_STYLE(0)
+        MUI_XYAT("EX", 32, 34, 5, " Meas ")
+        MUI_XYAT("BH", 96, 34, 4, " Input ")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 64, 58, 3, " exit ");
 
 int menu_initialise(void)
 {
@@ -404,6 +423,9 @@ void run_submenu(void)
                 break;
         //MOD Tables
         case 4:
+                mui.gotoForm(5, 0);
+                break;
+        case 40:
                 check_button_event();
 
                 u8g2.clearBuffer();
@@ -438,7 +460,7 @@ void run_submenu(void)
                 u8g2.print(" m");
 
                 break;
-        case 40:
+        case 400:
                 check_button_event();
 
                 u8g2.clearBuffer();
@@ -782,6 +804,20 @@ void submenu_cases(void)
                 break;
         case 3:
                 submenu_selected = 0;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        case 4:
+                O2_fraction_last = (O2_calibration_target_ten * 0.1) + (O2_calibration_target_one * 0.01);
+                He_fraction_last = (dist_calibration_target_ten * 0.1) + (dist_calibration_target_one * 0.01);
+                H2O_fraction_last = 0;
+                temperature_K_last = 293;
+                submenu_selected = 40;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        case 5:
+                submenu_selected = 40;
                 calib_page_exit_code = 0;
                 button_event = 0;
                 break;
