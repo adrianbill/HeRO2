@@ -371,12 +371,13 @@ void run_submenu(void)
 
                 u8g2.setFont(u8g2_font_helvR08_te);
 
-                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
+                // u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
                 // u8g2.print("H₂O ");
                 // u8g2.print(H2O_fraction * 100, 2);
                 // u8g2.print(" %");
-                u8g2.print("S ");
-                u8g2.print(speed_of_sound_m_s, 1);
+                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("Spd 000 m/s"), y_start + 2);
+                u8g2.print("Spd ");
+                u8g2.print(speed_of_sound_m_s, 0);
                 u8g2.print(" m/s");
 
                 u8g2.setFont(u8g2_font_helvR18_te);
