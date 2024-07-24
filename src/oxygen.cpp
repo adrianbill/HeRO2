@@ -18,7 +18,7 @@ ADS1115 ads(0x48);
 
 // O2 running average setup
 RunningAverage RA_O2_measure(100);
-RunningAverage RA_O2_calibration(100);
+RunningAverage RA_O2_calibration(500);
 
 // Initialises Analog to Digital Converter for O2 Sensor and clear running average
 int O2_Initialise(void)

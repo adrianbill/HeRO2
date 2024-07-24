@@ -7,6 +7,7 @@
 // Custom Headers
 #include "constants.h"
 #include "environment.h" // environmenttal parameters: temperature, humidity, atmospheric pressure
+#include "oxygen.h"      // oxygen calculations
 
 // Paired Header
 #include "helium.h"
@@ -14,6 +15,7 @@
 // Running Average Setup
 RunningAverage RA_dur(100);
 RunningAverage RA_He(100);
+RunningAverage RA_dist_calibration(500);
 
 // helium initialization
 int He_Initialise(void)
@@ -25,6 +27,7 @@ int He_Initialise(void)
         
         RA_dur.clear();
         RA_He.clear();
+        RA_dist_calibration.clear();
 
         if (!measure_duration()) {
                 Serial.println("Failed to measure speed.");
@@ -99,13 +102,19 @@ double speed_measurement(void)
 }
 
 // Function to calibrate distance, returns distance in m
-void calibrate_distance(double He_fraction, double O2_fraction, double H2O_fraction)
+void calibrate_distance(double He_fraction)
 {
-        double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
-        double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
-        double duration = measure_duration();
+        for (int i = 0; i <= 500; i++) {
+                double O2_fraction = oxygen_measurement();
+                double H2O_fraction = water_measurement();
+                double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
+                double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
+                double duration = measure_duration();
 
-        distance_calibrated = speed_of_sound_calculated * duration;
+                RA_dist_calibration.addValue(speed_of_sound_calculated * duration);
+        }
+
+        distance_calibrated = RA_dist_calibration.getAverage();
 
         EEPROM.writeDouble(eeprom_dist_address, distance_calibrated);
         EEPROM.commit();

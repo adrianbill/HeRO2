@@ -705,7 +705,7 @@ void dist_calibrate_run_display(void)
         u8g2.print(" %");
         u8g2.sendBuffer();
 
-        calibrate_distance(dist_calibration_target, oxygen_measurement(), water_measurement());
+        calibrate_distance(dist_calibration_target);
 
         delay(2000);
 
