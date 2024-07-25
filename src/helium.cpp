@@ -1,8 +1,9 @@
 // Libraries
 #include <Arduino.h>	    // Basic Library
 #include <RunningAverage.h> // Running Average Library
+#include <RunningMedian.h>  // Running Median Library
 #include <math.h>	    // Math Library
-#include "EEPROM.h"
+#include <EEPROM.h>
 
 // Custom Headers
 #include "constants.h"
@@ -13,9 +14,9 @@
 #include "helium.h"
 
 // Running Average Setup
-RunningAverage RA_dur(100);
-RunningAverage RA_He(100);
-RunningAverage RA_dist_calibration(500);
+RunningMedian RM_dur(19);
+RunningMedian RM_He(99);
+RunningMedian RM_dist_calibration(99);
 
 // helium initialization
 int He_Initialise(void)
@@ -25,9 +26,8 @@ int He_Initialise(void)
         pinMode(echoPin0, INPUT);
         // pinMode(echoPin1, INPUT);
         
-        RA_dur.clear();
-        RA_He.clear();
-        RA_dist_calibration.clear();
+        RM_dur.clear();
+        RM_He.clear();
 
         if (!measure_duration()) {
                 Serial.println("Failed to measure speed.");
@@ -67,31 +67,33 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
-        // Clear the trigger pin
-        digitalWrite(trigPin, LOW);
-        delayMicroseconds(2);
+        for (int i = 0; i <= 20; i++) {
+                // Clear the trigger pin
+                digitalWrite(trigPin, LOW);
+                delayMicroseconds(2);
 
-        // Send a 10 microsecond pulse to trigger the sensor
-        digitalWrite(trigPin, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trigPin, LOW);
+                // Send a 10 microsecond pulse to trigger the sensor
+                digitalWrite(trigPin, HIGH);
+                delayMicroseconds(10);
+                digitalWrite(trigPin, LOW);
 
-        double duration0 = pulseIn(echoPin0, HIGH);
-        RA_dur.addValue(duration0);
+                double duration0 = pulseIn(echoPin0, HIGH);
+                RM_dur.add(duration0);
 
-//     // Clear the trigger pin
-//     digitalWrite(trigPin, LOW);
-//     delayMicroseconds(2);
+        //     // Clear the trigger pin
+        //     digitalWrite(trigPin, LOW);
+        //     delayMicroseconds(2);
 
-//     // Send a 10 microsecond pulse to trigger the sensor
-//     digitalWrite(trigPin, HIGH);
-//     delayMicroseconds(10);
-//     digitalWrite(trigPin, LOW);
+        //     // Send a 10 microsecond pulse to trigger the sensor
+        //     digitalWrite(trigPin, HIGH);
+        //     delayMicroseconds(10);
+        //     digitalWrite(trigPin, LOW);
 
-//     double duration1 = pulseIn(echoPin1, HIGH);
-//     RA_dur.addValue(duration1);
+        //     double duration1 = pulseIn(echoPin1, HIGH);
+        //     RM_dur.add(duration1);
+        }
 
-        return RA_dur.getAverage() / 1000000;
+        return RM_dur.getAverage(5) / 1000000;
 }
 
 // speed of sound measurement
@@ -104,27 +106,29 @@ double speed_measurement(void)
 // Function to calibrate distance, returns distance in m
 void calibrate_distance(double He_fraction)
 {
-        for (int i = 0; i <= 500; i++) {
+        RM_dist_calibration.clear();
+
+        for (int i = 0; i <= 100; i++) {
                 double O2_fraction = oxygen_measurement();
                 double H2O_fraction = water_measurement();
                 double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
                 double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature_measurement());
                 double duration = measure_duration();
 
-                RA_dist_calibration.addValue(speed_of_sound_calculated * duration);
+                RM_dist_calibration.add(speed_of_sound_calculated * duration);
         }
 
-        distance_calibrated = RA_dist_calibration.getAverage();
+        distance_calibrated = RM_dist_calibration.getAverage(25);
 
         EEPROM.writeDouble(eeprom_dist_address, distance_calibrated);
         EEPROM.commit();
 
-        Serial.println("Dist Calibrated");
+        // Serial.println("Dist Calibrated");
 
-        Serial.print("Value: ");
-        Serial.print(distance_calibrated, 8);
-        Serial.print(" | eeprom: ");
-        Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
+        // Serial.print("Value: ");
+        // Serial.print(distance_calibrated, 8);
+        // Serial.print(" | eeprom: ");
+        // Serial.println(EEPROM.readDouble(eeprom_dist_address), 8);
 }
 
 //  New function to trigger helium reading under development
@@ -134,29 +138,32 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
         double threshold = 1.0;
         double error = 0.0;
 
-        double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-        double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
+        for (int i = 0; i <= 24; i++) {
+                
+                double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+                double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
 
-        do {
-                double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
+                do {
+                        double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
 
-                error = speed_of_sound_measured - speed_of_sound_calculated;
+                        error = speed_of_sound_measured - speed_of_sound_calculated;
 
-                He_fraction = gain * error + He_fraction;
+                        He_fraction = gain * error + He_fraction;
 
-                if (He_fraction > He_fraction_max) {
-                        He_fraction = He_fraction_max;
-                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-                        break;
-                } else if (He_fraction < 0) {
-                        He_fraction = 0.0;
-                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-                        break;
-                }
+                        if (He_fraction > He_fraction_max) {
+                                He_fraction = He_fraction_max;
+                                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+                                break;
+                        } else if (He_fraction < 0) {
+                                He_fraction = 0.0;
+                                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+                                break;
+                        }
 
-        } while (abs(error) > threshold);
+                } while (abs(error) > threshold);
 
-        RA_He.addValue(He_fraction);
+                RM_He.add(He_fraction);
+        }
 
-        return RA_He.getAverage();
+        return RM_He.getAverage(25);
 }

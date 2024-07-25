@@ -2,6 +2,7 @@
 #include <Arduino.h>	    // Basic Library
 #include <BME280I2C.h>	    // Temp/Hum/Pres sensor Library
 #include <RunningAverage.h> // Running Average Library
+#include <RunningMedian.h>  // Running Median Library
 #include <Wire.h>	    // I2C Library
 
 // Paired Header
@@ -11,9 +12,9 @@
 BME280I2C bme;
 
 // Running Average Setup
-RunningAverage RA_temperature(100);
-RunningAverage RA_humidity(100);
-RunningAverage RA_pressure(100);
+RunningMedian RM_temperature(99);
+RunningMedian RM_humidity(99);
+RunningMedian RM_pressure(99);
 
 // Initialize HTU21D sensor and clear running averages
 int Environment_Initialise(void)
@@ -24,9 +25,9 @@ int Environment_Initialise(void)
                         ;
         }
 
-        RA_temperature.clear();
-        RA_humidity.clear();
-        RA_pressure.clear();
+        RM_temperature.clear();
+        RM_humidity.clear();
+        RM_pressure.clear();
 
         return 1;
 }
@@ -35,27 +36,27 @@ int Environment_Initialise(void)
 double temperature_measurement(void)
 {
         double temp_measure = bme.temp() + 273.15;
-        RA_temperature.addValue(temp_measure);
+        RM_temperature.add(temp_measure);
 
-        return RA_temperature.getAverage();
+        return RM_temperature.getMedian();
 }
 
 // Relative Humidity Measurement Function
 double humidity_measurement(void)
 {
         double hum_measure = bme.hum() / 100;
-        RA_humidity.addValue(hum_measure);
+        RM_humidity.add(hum_measure);
 
-        return RA_humidity.getAverage();
+        return RM_humidity.getMedian();
 }
 
 // Atmospheric Pressure Measurement Function in kPa
 double atmpressure_measurement(void)
 {
         double pressure_total = bme.pres() / 10; // reads pressure in hPa and converts to kPa
-        RA_pressure.addValue(pressure_total);
+        RM_pressure.add(pressure_total);
 
-        return RA_pressure.getAverage();
+        return RM_pressure.getMedian();
 }
 
 // Function to calculate the fraction of water in gas using relative humidity using Tetens equation

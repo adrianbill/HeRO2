@@ -7,13 +7,15 @@
 #include <BME280I2C.h>      // Temp/Hum/Pres sensor Library
 #include <ADS1X15.h>        // ADC / Amplifier Library
 #include <RunningAverage.h> // Running Average Library
-#include "EEPROM.h"
+#include <RunningMedian.h>  // Running Median Library
+#include <EEPROM.h>
 
 // Custom Headers
 #include "constants.h"   // Global Constants
 #include "oxygen.h"      // oxygen calculations
 #include "environment.h" // environmenttal parameters: temperature, humidity, atmospheric pressure
 #include "helium.h"      // ultrasonic measurement and helium calculations
+#include "gas_calcs.h"   // general gas calculations for dive planning, etc.
 
 // Paired Header
 #include "menu.h"       // menu parameters and definitions, used to clean up top of this file
