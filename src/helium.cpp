@@ -14,9 +14,9 @@
 #include "helium.h"
 
 // Running Average Setup
-RunningMedian RM_dur(19);
-RunningMedian RM_He(99);
-RunningMedian RM_dist_calibration(99);
+RunningMedian RM_dur(99);
+RunningAverage RM_He(500);
+RunningAverage RM_dist_calibration(500);
 
 // helium initialization
 int He_Initialise(void)
@@ -67,7 +67,6 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
-        for (int i = 0; i <= 20; i++) {
                 // Clear the trigger pin
                 digitalWrite(trigPin, LOW);
                 delayMicroseconds(2);
@@ -91,9 +90,7 @@ double measure_duration(void)
 
         //     double duration1 = pulseIn(echoPin1, HIGH);
         //     RM_dur.add(duration1);
-        }
-
-        return RM_dur.getAverage(5) / 1000000;
+        return RM_dur.getAverage(25) / 1000000;
 }
 
 // speed of sound measurement
@@ -108,7 +105,7 @@ void calibrate_distance(double He_fraction)
 {
         RM_dist_calibration.clear();
 
-        for (int i = 0; i <= 100; i++) {
+        for (int i = 0; i <= 500; i++) {
                 double O2_fraction = oxygen_measurement();
                 double H2O_fraction = water_measurement();
                 double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
@@ -118,7 +115,7 @@ void calibrate_distance(double He_fraction)
                 RM_dist_calibration.add(speed_of_sound_calculated * duration);
         }
 
-        distance_calibrated = RM_dist_calibration.getAverage(25);
+        distance_calibrated = RM_dist_calibration.getAverage();
 
         EEPROM.writeDouble(eeprom_dist_address, distance_calibrated);
         EEPROM.commit();
@@ -137,33 +134,30 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
         double gain = 0.001;
         double threshold = 1.0;
         double error = 0.0;
+             
+        double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+        double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
 
-        for (int i = 0; i <= 24; i++) {
-                
-                double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-                double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
+        do {
+                double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
 
-                do {
-                        double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
+                error = speed_of_sound_measured - speed_of_sound_calculated;
 
-                        error = speed_of_sound_measured - speed_of_sound_calculated;
+                He_fraction = gain * error + He_fraction;
 
-                        He_fraction = gain * error + He_fraction;
+                if (He_fraction > He_fraction_max) {
+                        He_fraction = He_fraction_max;
+                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+                        break;
+                } else if (He_fraction < 0) {
+                        He_fraction = 0.0;
+                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+                        break;
+                }
 
-                        if (He_fraction > He_fraction_max) {
-                                He_fraction = He_fraction_max;
-                                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-                                break;
-                        } else if (He_fraction < 0) {
-                                He_fraction = 0.0;
-                                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-                                break;
-                        }
+        } while (abs(error) > threshold);
 
-                } while (abs(error) > threshold);
+        RM_He.add(He_fraction);
 
-                RM_He.add(He_fraction);
-        }
-
-        return RM_He.getAverage(25);
+        return RM_He.getAverage();
 }
