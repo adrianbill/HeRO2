@@ -515,9 +515,15 @@ void run_submenu(void)
                 x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("000 m");
 
                 u8g2.setCursor(5, 31);
-                u8g2.print("30 m END");
+                u8g2.print("30 m N₂");
                 u8g2.setCursor(x_gap, 31);
                 u8g2.print(END_calculate(He_fraction_last, O2_fraction_last, H2O_fraction_last, 30.0));
+                u8g2.print(" m");
+
+                u8g2.setCursor(5, 45);
+                u8g2.print("30 m N₂+O₂");
+                u8g2.setCursor(x_gap, 45);
+                u8g2.print(END_calculate(He_fraction_last, 0, 0, 30.0));
                 u8g2.print(" m");
                 
                 break;
