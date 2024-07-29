@@ -23,10 +23,10 @@ int MOD_density_calculate(double He_fraction, double O2_fraction, double H2O_fra
         return round(0.1 * pressure_kPa - 10);
 }
 
-int END_calculate(double He_fraction, double O2_fraction, double H2O_fraction, double depth)
+int END_calculate(double He_fraction, double O2_fraction, double H2O_fraction, double END)
 {
         double N2_fraction = 1 - He_fraction - O2_fraction - H2O_fraction;
-        return round((depth + 10) * N2_fraction - 10);
+        return round((END + 10) / N2_fraction - 10);
 }
 
 double min_gas_rec(double depth, double consumption_rate)
