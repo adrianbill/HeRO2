@@ -173,7 +173,7 @@ $c = \sqrt{\frac{{\large \gamma_{mix}} R T}{M_{mix}}}$
 3. Calculate the speed of sound
 4. Measure the speed of sound
 5. Use proportional control method ([Ref: wikipedia](https://en.wikipedia.org/wiki/Proportional_control)): 
-   - $x_{He(new)} = {\small K}_p \cdot err + x_{He(last)}$
+   - $x_{He(new)} =  K_p \cdot err + x_{He(last)}$
    - $error = c_{calc} - c_{meas}$ (the difference between calculated and measured speeds)
    - $K_p$ is the proportional gain, a constant used to scale the error for the desired response rate ( for this application are value of 0.001 is used)
 6. Check if error is within acceptable $error$ range (an acceptable $error$ of ±1 m/s was chosen). 
