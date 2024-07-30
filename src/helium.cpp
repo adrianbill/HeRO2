@@ -67,17 +67,17 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
-                // Clear the trigger pin
-                digitalWrite(trigPin, LOW);
-                delayMicroseconds(2);
+        // Clear the trigger pin
+        digitalWrite(trigPin, LOW);
+        delayMicroseconds(2);
 
-                // Send a 10 microsecond pulse to trigger the sensor
-                digitalWrite(trigPin, HIGH);
-                delayMicroseconds(10);
-                digitalWrite(trigPin, LOW);
+        // Send a 10 microsecond pulse to trigger the sensor
+        digitalWrite(trigPin, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trigPin, LOW);
 
-                double duration0 = pulseIn(echoPin0, HIGH);
-                RM_dur.add(duration0);
+        double duration0 = pulseIn(echoPin0, HIGH);
+        RM_dur.add(duration0);
 
         //     // Clear the trigger pin
         //     digitalWrite(trigPin, LOW);
