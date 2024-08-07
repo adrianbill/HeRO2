@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+extern const double code_version;
+
 // Universal Gas constant, J/(mol.K)
 extern const double R_gas_constant;
 
@@ -27,6 +29,8 @@ extern double temperature_K_last;
 extern double O2_fraction_last;
 extern double He_fraction_last;
 extern double H2O_fraction_last;
+extern double He_spd;
+extern double He_error;
 
 //eeprom parameters for saving values across restarts
 extern int eeprom_size;

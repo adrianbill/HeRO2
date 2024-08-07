@@ -19,5 +19,6 @@ void load_calibration_values(void);
 void submenu_draw(void);
 void submenu_cases(void);
 int mui_active(void);
+void formatdate(char const *date, char *buff);
 
 #endif

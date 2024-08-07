@@ -1,6 +1,8 @@
 // Paired Header
 #include "constants.h"
 
+extern constexpr double code_version{0.9};
+
 // Universal Gas constant, J/(mol.K)
 extern constexpr double R_gas_constant{8.314462618};
 
@@ -27,6 +29,8 @@ double temperature_K_last = 0;
 double O2_fraction_last = 0;
 double He_fraction_last = 0;
 double H2O_fraction_last = 0;
+double He_spd;
+double He_error;
 
 //eeprom parameters for saving values across restarts
 int eeprom_size = 512;

@@ -82,7 +82,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
         {u8g2_font_open_iconic_embedded_4x_t, 72, 0, "Calibrate"},
         {u8g2_font_open_iconic_mime_4x_t, 70, 0, "MOD Tables"},        
         {u8g2_font_open_iconic_weather_4x_t, 64, 0, "Climate"},
-        {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Raw Data"},
+        {u8g2_font_open_iconic_embedded_4x_t, 70, 0, "Misc"},
         {NULL, 0, 0, NULL}
 };
 
@@ -361,6 +361,9 @@ void run_submenu(void)
                 break;
         // Trimix
         case 2:
+                u8g2.clearBuffer();
+                u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
+
                 temperature_K = temperature_measurement();
                 speed_of_sound_m_s = speed_measurement();
                 O2_fraction = oxygen_measurement();
@@ -373,14 +376,16 @@ void run_submenu(void)
 
                 u8g2.setFont(u8g2_font_helvR08_te);
 
-                // u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
-                // u8g2.print("H₂O ");
-                // u8g2.print(H2O_fraction * 100, 2);
-                // u8g2.print(" %");
-                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("Spd 000 m/s"), y_start + 2);
-                u8g2.print("Spd ");
-                u8g2.print(speed_of_sound_m_s, 0);
-                u8g2.print(" m/s");
+                u8g2.setCursor(0, y_start + 2);
+                u8g2.print("Temp ");
+                u8g2.print(temperature_K - 273.15, 1);
+                u8g2.print(" °C");
+
+                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
+                u8g2.print("H₂O ");
+                u8g2.print(H2O_fraction * 100, 2);
+                u8g2.print(" %");
+
 
                 u8g2.setFont(u8g2_font_helvR18_te);
 
@@ -406,6 +411,67 @@ void run_submenu(void)
                 H2O_fraction_last = H2O_fraction;
 
                 break;
+        case 20:
+                u8g2.clearBuffer();
+                u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
+
+                temperature_K = temperature_measurement();
+                speed_of_sound_m_s = speed_measurement();
+                O2_fraction = oxygen_measurement();
+                H2O_fraction = water_measurement();
+                
+                // calculate helium fraction
+                He_fraction = helium_measurement(He_fraction_last, O2_fraction, H2O_fraction, speed_of_sound_m_s, temperature_K);
+
+                check_button_event();
+
+                y_gap = 16;
+                x_gap = 4;
+
+                u8g2.drawHLine(0, y_gap * 1 + y_start + 4, u8g2.getDisplayWidth());
+                u8g2.drawHLine(0, y_gap * 2 + y_start + 4, u8g2.getDisplayWidth());
+                u8g2.drawHLine(0, y_gap * 3 + y_start + 4, u8g2.getDisplayWidth());
+
+                u8g2.setFont(u8g2_font_helvR08_te);
+
+                u8g2.setCursor(0, y_start + 2);
+                u8g2.print("Temp ");
+                u8g2.print(temperature_K - 273.15, 1);
+                u8g2.print(" °C");
+
+                u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getUTF8Width("H₂O 0.00 %"), y_start + 2);
+                u8g2.print("H₂O ");
+                u8g2.print(H2O_fraction * 100, 2);
+                u8g2.print(" %");
+
+                u8g2.setCursor(x_gap, y_gap * 1 + y_start);
+                u8g2.print("O₂");   
+                if (O2_fraction < 0.10) u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   ") + u8g2.getStrWidth("0"), y_gap * 1 + y_start);
+                else u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   "), y_gap * 1 + y_start);
+                u8g2.print(O2_fraction * 100, 2);
+                u8g2.print(" % ± ");
+                u8g2.print(oxygen_stddev() * 100, 2);
+
+                u8g2.setCursor(x_gap, y_gap * 2 + y_start);
+                u8g2.print("He");
+                if (He_fraction < 0.10) u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   ") + u8g2.getStrWidth("0"), y_gap * 2 + y_start);
+                else u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   "), y_gap * 2 + y_start);
+                u8g2.print(He_fraction * 100, 2);
+                u8g2.print(" % ± ");
+                u8g2.print(helium_stddev() * 100, 2);
+                
+                u8g2.setCursor(x_gap, y_gap * 3 + y_start);
+                u8g2.print("Spd   ");
+                u8g2.print(He_spd, 2);
+                u8g2.print(" m/s ± ");
+                u8g2.print(He_error, 2);
+
+                temperature_K_last = temperature_K;
+                O2_fraction_last = O2_fraction;
+                He_fraction_last = He_fraction;
+                H2O_fraction_last = H2O_fraction;
+
+                break;
         // Calibrate
         case 3:
                 u8g2.setFont(u8g2_font_helvR12_te);
@@ -420,7 +486,7 @@ void run_submenu(void)
                 u8g2.setCursor(0, 60);
                 u8g2.print("Dist");
                 u8g2.setCursor(x_gap, 60); 
-                u8g2.print(distance_calibrated / 2 * 1000, 2);
+                u8g2.print(distance_calibrated * 1000, 2);
                 u8g2.print(" mm");
 
                 break;
@@ -561,6 +627,11 @@ void run_submenu(void)
                 break;
         // Raw Data
         case 6:
+                u8g2.clearBuffer();
+                u8g2.setFont(u8g2_font_helvR10_te);
+                u8g2.drawUTF8(0, y_start + 2, "Raw Data");
+                u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
+                
                 temperature_C = temperature_measurement() - 273.15;
                 relative_humidity = humidity_measurement();
                 local_pressure_kPa = atmpressure_measurement();
@@ -571,12 +642,13 @@ void run_submenu(void)
 
                 y_gap = 16;
 
-                u8g2.drawVLine(u8g2.getDisplayWidth() / 2 - 2, y_start + 4, y_gap * 2 + 1);
+                u8g2.drawVLine(u8g2.getDisplayWidth() / 2 - 2, y_start + 5, y_gap * 2);
                 u8g2.drawHLine(0, y_gap * 1 + y_start + 4, u8g2.getDisplayWidth());
                 u8g2.drawHLine(0, y_gap * 2 + y_start + 4, u8g2.getDisplayWidth());
                 u8g2.drawHLine(0, y_gap * 3 + y_start + 4, u8g2.getDisplayWidth());
 
                 u8g2.setFont(u8g2_font_helvR08_te);
+
                 u8g2.setCursor(0, y_gap * 1 + y_start);
                 u8g2.print("O₂ ");
                 u8g2.print(O2_mV, 2);
@@ -603,6 +675,37 @@ void run_submenu(void)
                 u8g2.print(" kPa");
 
                 break;
+        // About page        
+        case 60:
+                u8g2.clearBuffer();
+                u8g2.setFont(u8g2_font_helvR10_te);
+                u8g2.drawUTF8(0, y_start + 2, "About");
+                u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
+
+                check_button_event();
+
+                y_gap = 14;
+
+                u8g2.setFont(u8g2_font_helvR08_te);
+
+                u8g2.setCursor(0, y_gap * 1 + y_start + 3);
+                {
+                char date_format[13];
+                formatdate(__DATE__, date_format);
+                u8g2.print(date_format);
+                u8g2.print(" ");
+                u8g2.print(__TIME__);
+                }
+
+                u8g2.setCursor(0, y_gap * 2 + y_start + 3);
+                u8g2.print("Version  ");
+                u8g2.print(code_version, 2);
+
+                u8g2.setCursor(0, y_gap * 3 + y_start + 3);
+                u8g2.print("by Adrian Bill");
+
+                break;
+
         case 30:
                 mui.gotoForm(3, 0);
                 break;
@@ -621,7 +724,7 @@ void O2_calibrate_run_display(void)
         u8g2.clearBuffer();
 
         u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.drawUTF8(0, 12, menu_entry_list[3].name);
+        u8g2.drawUTF8(0, 12, menu_entry_list[2].name);
         u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
         u8g2.setCursor(0, 30);
         u8g2.print("Calibrating O₂");
@@ -635,7 +738,7 @@ void O2_calibrate_run_display(void)
 
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.drawUTF8(0, 12, menu_entry_list[3].name);
+        u8g2.drawUTF8(0, 12, menu_entry_list[2].name);
         u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
         u8g2.setCursor(0, 30);
         u8g2.print("Complete");
@@ -652,7 +755,7 @@ void dist_calibrate_run_display(void)
 {
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.drawUTF8(0, 12, menu_entry_list[3].name);
+        u8g2.drawUTF8(0, 12, menu_entry_list[2].name);
         u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
         u8g2.setCursor(0, 30);
         u8g2.print("Calibrating Dist");
@@ -668,13 +771,13 @@ void dist_calibrate_run_display(void)
 
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_helvR10_te);
-        u8g2.drawUTF8(0, 12, menu_entry_list[3].name);
+        u8g2.drawUTF8(0, 12, menu_entry_list[2].name);
         u8g2.drawHLine(0, 14, u8g2.getDisplayWidth());
         u8g2.setCursor(0, 30);
         u8g2.print("Complete");
         u8g2.setCursor(0, 55);
         u8g2.print("Dist ");
-        u8g2.print(distance_calibrated/2 * 1000, 1);
+        u8g2.print(distance_calibrated * 1000, 1);
         u8g2.print(" mm");
         u8g2.sendBuffer();
 
@@ -687,8 +790,8 @@ void splash_screen(void)
 
         u8g2.setFont(u8g2_font_helvR24_te);
 
-        u8g2.clearBuffer();
-
+        u8g2.clearBuffer();      
+        
         u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getUTF8Width("HeRO")) / 2, y_start);
         u8g2.print("HeRO₂");
 
@@ -697,9 +800,14 @@ void splash_screen(void)
         u8g2.print("gas analyser");
 
         u8g2.setFont(u8g2_font_helvR08_te);
+
+        u8g2.setCursor(0, u8g2.getDisplayHeight() - 2);
+        u8g2.print("Ver. ");
+        u8g2.print(code_version, 2);
+
         u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("by a. bill"), u8g2.getDisplayHeight() - 2);
         u8g2.print("by a. bill");
-
+        
         u8g2.sendBuffer();
 }
 
@@ -847,4 +955,11 @@ uint8_t towards(struct menu_state *current, struct menu_state *destination)
                 towards_rate |= towards_int16(&(current->menu_start), destination->menu_start);
 
         return towards_rate;
+}
+
+void formatdate(char const *date, char *buff) { 
+    int day, year;
+    char month[4];
+    sscanf(date, "%s %d %d", &month, &day, &year);
+    sprintf(buff, "%02d %s %d", day, month, year);
 }

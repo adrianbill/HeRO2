@@ -18,8 +18,9 @@
 ADS1115 ads(0x48);
 
 // O2 running average setup
-RunningMedian RM_O2_mv(99);
-RunningMedian RM_O2_calibration(99);
+RunningAverage RM_O2_mv(500);
+RunningAverage RM_O2_fraction(500);
+RunningAverage RM_O2_calibration(1000);
 
 // Initialises Analog to Digital Converter for O2 Sensor and clear running average
 int O2_Initialise(void)
@@ -37,16 +38,24 @@ int O2_Initialise(void)
         return 1;
 }
 
+// Function to return O2 millivolts
+double oxygen_millivolts(void)
+{
+        RM_O2_mv.add(ads.readADC_Differential_0_1());
+        
+        return ads.toVoltage(RM_O2_mv.getAverage()) * 1000;
+}
+
 // Function to calibration Oxygen
 void calibrate_oxygen(void)
 {
         RM_O2_calibration.clear();
 
-        for (int i = 0; i <= 100; i++) {
+        for (int i = 0; i <= 1000; i++) {
                 RM_O2_calibration.add(ads.readADC_Differential_0_1());
         }
 
-        double voltage_meas_mV = ads.toVoltage(RM_O2_calibration.getAverage(25)) * 1000;
+        double voltage_meas_mV = ads.toVoltage(RM_O2_calibration.getAverage()) * 1000;
 
         O2_calibration = O2_cal_target / voltage_meas_mV;
 
@@ -64,15 +73,12 @@ void calibrate_oxygen(void)
 // Function to measure Oxygen
 double oxygen_measurement(void)
 {
-        double voltage_meas_mV = oxygen_millivolts();
+        RM_O2_fraction.addValue(oxygen_millivolts() * O2_calibration);    
 
-        return voltage_meas_mV * O2_calibration;
+        return RM_O2_fraction.getAverage();
 }
 
-// Function to return O2 millivolts
-double oxygen_millivolts(void)
+double oxygen_stddev(void)
 {
-        RM_O2_mv.add(ads.readADC_Differential_0_1());
-        
-        return ads.toVoltage(RM_O2_mv.getAverage(25)) * 1000;
+        return RM_O2_fraction.getStandardDeviation(); 
 }

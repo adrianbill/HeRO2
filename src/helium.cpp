@@ -15,8 +15,8 @@
 
 // Running Average Setup
 RunningMedian RM_dur(99);
-RunningAverage RM_He(500);
-RunningAverage RM_dist_calibration(500);
+RunningAverage RM_He(1000);
+RunningAverage RM_dist_calibration(1000);
 
 // helium initialization
 int He_Initialise(void)
@@ -79,17 +79,6 @@ double measure_duration(void)
         double duration0 = pulseIn(echoPin0, HIGH);
         RM_dur.add(duration0);
 
-        //     // Clear the trigger pin
-        //     digitalWrite(trigPin, LOW);
-        //     delayMicroseconds(2);
-
-        //     // Send a 10 microsecond pulse to trigger the sensor
-        //     digitalWrite(trigPin, HIGH);
-        //     delayMicroseconds(10);
-        //     digitalWrite(trigPin, LOW);
-
-        //     double duration1 = pulseIn(echoPin1, HIGH);
-        //     RM_dur.add(duration1);
         return RM_dur.getAverage(25) / 1000000;
 }
 
@@ -105,7 +94,7 @@ void calibrate_distance(double He_fraction)
 {
         RM_dist_calibration.clear();
 
-        for (int i = 0; i <= 500; i++) {
+        for (int i = 0; i <= 1000; i++) {
                 double O2_fraction = oxygen_measurement();
                 double H2O_fraction = water_measurement();
                 double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
@@ -134,12 +123,13 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
         double gain = 0.001;
         double threshold = 1.0;
         double error = 0.0;
+        double speed_of_sound_calculated;
              
         double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
         double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
 
         do {
-                double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
+                speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
 
                 error = speed_of_sound_measured - speed_of_sound_calculated;
 
@@ -159,5 +149,13 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 
         RM_He.add(He_fraction);
 
+        He_spd = speed_of_sound_calculated;
+        He_error = abs(error);
+
         return RM_He.getAverage();
+}
+
+double helium_stddev(void)
+{
+        return RM_He.getStandardDeviation();
 }
