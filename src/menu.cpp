@@ -77,6 +77,7 @@ uint8_t dist_calibration_target_dec = 0;
 // mui distance calibration inputs
 uint8_t temp_calibration_target_ten = 0;
 uint8_t temp_calibration_target_one = 0;
+uint8_t temp_calibration_target_dec = 0;
 uint8_t temp_calibration_target_sign = 0;
 
 // Main Menu items
@@ -94,6 +95,7 @@ struct menu_entry_type menu_entry_list[ELEMENTS] = {
 muif_t muif_list[] = {
         MUIF_U8G2_FONT_STYLE(0, u8g2_font_helvR12_te), /* regular font */
         MUIF_U8G2_FONT_STYLE(1, u8g2_font_helvR08_te), /* bold font */
+        MUIF_U8G2_FONT_STYLE(3, u8g2_font_helvR10_te), /* regular font */
 
         MUIF_U8G2_LABEL(),
 
@@ -105,6 +107,7 @@ muif_t muif_list[] = {
         MUIF_U8G2_U8_MIN_MAX("DC", &dist_calibration_target_dec, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
         MUIF_U8G2_U8_MIN_MAX("EA", &temp_calibration_target_ten, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
         MUIF_U8G2_U8_MIN_MAX("EB", &temp_calibration_target_one, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
+        MUIF_U8G2_U8_MIN_MAX("EC", &temp_calibration_target_dec, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
         MUIF_VARIABLE("RB",&temp_calibration_target_sign,mui_u8g2_u8_radio_wm_pi),
 
         MUIF_BUTTON("BO", mui_u8g2_btn_goto_wm_fi),
@@ -116,10 +119,10 @@ muif_t muif_list[] = {
 fds_t fds_data[] =
 
         MUI_FORM(3)
-        MUI_STYLE(0)
-        MUI_XYAT("BO", 16, 34, 1, " O₂ ")
-        MUI_XYAT("BH", 64, 34, 2, " He ")
-        MUI_XYAT("BH", 112, 34, 6, " Temp ")
+        MUI_STYLE(3)
+        MUI_XYAT("BO", 18, 34, 1, " O₂ ")
+        MUI_XYAT("BH", 54, 34, 2, " He ")
+        MUI_XYAT("BH", 100, 34, 6, " Temp ")
         MUI_STYLE(1)
         MUI_XYAT("EX", 64, 58, 3, " exit ")
 
@@ -169,13 +172,15 @@ fds_t fds_data[] =
         
         MUI_FORM(6)
         MUI_STYLE(0)
-        MUI_LABEL(0, 34, "Temp ")
-        MUI_XY("EA", 65, 34)
-        MUI_XY("EB", 75, 34)
-        MUI_LABEL(85, 34, " °C")
-        MUI_XYAT("RB", 1, 44, 1, "Neg")
-        MUI_XYAT("RB", 65, 44, 0, "Pos")
+        MUI_LABEL(0, 28, "Temp ")
+        MUI_XY("EA", 65, 28)
+        MUI_XY("EB", 75, 28)
+        MUI_LABEL(85, 28, ".")
+        MUI_XY("DC", 95, 28)
+        MUI_LABEL(105, 28, " °C")
         MUI_STYLE(1)
+        MUI_XYAT("RB", 32, 43, 0, "Pos")
+        MUI_XYAT("RB", 70, 43, 1, "Neg")
         MUI_XYAT("EX", 32, 58, 6, " calibrate ")
         MUI_XYAT("BA", 104, 58, 3, " back ");
 
@@ -495,20 +500,26 @@ void run_submenu(void)
                 break;
         // Calibrate
         case 3:
-                u8g2.setFont(u8g2_font_helvR12_te);
+                u8g2.setFont(u8g2_font_helvR10_te);
                 x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("00.00 %/V");
 
-                u8g2.setCursor(0, 36);
+                u8g2.setCursor(0, 31);
                 u8g2.print("O₂");
-                u8g2.setCursor(x_gap, 36);              
+                u8g2.setCursor(x_gap, 31);              
                 u8g2.print(O2_calibration * 1000, 2);
                 u8g2.print(" %/V");
 
-                u8g2.setCursor(0, 60);
+                u8g2.setCursor(0, 47);
                 u8g2.print("Dist");
-                u8g2.setCursor(x_gap, 60); 
+                u8g2.setCursor(x_gap, 47); 
                 u8g2.print(distance_calibrated * 1000, 2);
                 u8g2.print(" mm");
+
+                u8g2.setCursor(0, u8g2.getDisplayHeight());
+                u8g2.print("Temp");
+                u8g2.setCursor(x_gap, u8g2.getDisplayHeight()); 
+                u8g2.print(EEPROM.readDouble(eeprom_temp_address), 1);
+                u8g2.print("  °C");
 
                 break;
         //MOD Tables
@@ -653,10 +664,10 @@ void run_submenu(void)
                 u8g2.drawUTF8(0, y_start + 2, "Raw Data");
                 u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
                 
-                temperature_C = temperature_measurement() - 273.15;
+                temperature_C = temperature_measurement() - 273.15 - EEPROM.readDouble(eeprom_temp_address);
                 relative_humidity = humidity_measurement();
                 local_pressure_kPa = atmpressure_measurement();
-                duration_us = measure_duration() * 1000000;
+                duration_us = measure_duration() * 1000000.0;
                 O2_mV = oxygen_millivolts();
 
                 check_button_event();
@@ -909,8 +920,8 @@ void submenu_cases(void)
                 button_event = 0;
                 break;
         case 6:
-                if (temp_calibration_target_sign == 0) EEPROM.writeDouble(eeprom_temp_address, temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0);
-                if (temp_calibration_target_sign == 1) EEPROM.writeDouble(eeprom_temp_address, -1.0 * (temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0));
+                if (temp_calibration_target_sign == 0) EEPROM.writeDouble(eeprom_temp_address, temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0 + dist_calibration_target_dec * 0.1);
+                if (temp_calibration_target_sign == 1) EEPROM.writeDouble(eeprom_temp_address, -1.0 * (temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0 + dist_calibration_target_dec * 0.1));
                 EEPROM.commit();
                 submenu_selected = 0;               
                 calib_page_exit_code = 0;

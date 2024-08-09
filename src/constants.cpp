@@ -1,7 +1,7 @@
 // Paired Header
 #include "constants.h"
 
-extern constexpr double code_version{0.9};
+extern constexpr double code_version{0.91};
 
 // Universal Gas constant, J/(mol.K)
 extern constexpr double R_gas_constant{8.314462618};

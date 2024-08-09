@@ -4,6 +4,7 @@
 #include <RunningAverage.h> // Running Average Library
 #include <RunningMedian.h>  // Running Median Library
 #include <Wire.h>	    // I2C Library
+#include <EEPROM.h>
 
 #include "constants.h"
 

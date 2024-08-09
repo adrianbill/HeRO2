@@ -14,9 +14,11 @@
 #include "helium.h"
 
 // Running Average Setup
-RunningMedian RM_dur(99);
-RunningAverage RM_He(1000);
-RunningAverage RM_dist_calibration(1000);
+RunningMedian RM_dur(11);
+RunningAverage RM_He(11);
+RunningMedian RM_dist_calibration(19);
+
+unsigned long previousMillis = 0;
 
 // helium initialization
 int He_Initialise(void)
@@ -67,19 +69,24 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
-        // Clear the trigger pin
-        digitalWrite(trigPin, LOW);
-        delayMicroseconds(2);
+        unsigned long currentMillis = millis();
 
-        // Send a 10 microsecond pulse to trigger the sensor
-        digitalWrite(trigPin, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trigPin, LOW);
+        if (currentMillis - previousMillis > 125) {
+                // Clear the trigger pin
+                digitalWrite(trigPin, LOW);
+                delayMicroseconds(2);
 
-        double duration0 = pulseIn(echoPin0, HIGH);
-        RM_dur.add(duration0);
+                // Send a 10 microsecond pulse to trigger the sensor
+                digitalWrite(trigPin, HIGH);
+                delayMicroseconds(10);
+                digitalWrite(trigPin, LOW);
 
-        return RM_dur.getAverage(25) / 1000000;
+                double duration0 = pulseIn(echoPin0, HIGH);
+                RM_dur.add(duration0);
+
+                previousMillis = currentMillis;
+        }
+        return RM_dur.getMedian() / 1000000.0;
 }
 
 // speed of sound measurement
@@ -94,7 +101,7 @@ void calibrate_distance(double He_fraction)
 {
         RM_dist_calibration.clear();
 
-        for (int i = 0; i <= 1000; i++) {
+        for (int i = 0; i <= 50; i++) {
                 double O2_fraction = oxygen_measurement();
                 double H2O_fraction = water_measurement();
                 double N2_fraction = 1.0 - (He_fraction + O2_fraction + H2O_fraction);
@@ -104,7 +111,7 @@ void calibrate_distance(double He_fraction)
                 RM_dist_calibration.add(speed_of_sound_calculated * duration);
         }
 
-        distance_calibrated = RM_dist_calibration.getAverage();
+        distance_calibrated = RM_dist_calibration.getMedian();
 
         EEPROM.writeDouble(eeprom_dist_address, distance_calibrated);
         EEPROM.commit();
