@@ -5,6 +5,8 @@
 #include <RunningMedian.h>  // Running Median Library
 #include <Wire.h>	    // I2C Library
 
+#include "constants.h"
+
 // Paired Header
 #include "environment.h"
 
@@ -35,7 +37,7 @@ int Environment_Initialise(void)
 // Temperature Measurement Function in Kelvin
 double temperature_measurement(void)
 {
-        double temp_measure = bme.temp() + 273.15;
+        double temp_measure = bme.temp() + 273.15 + EEPROM.readDouble(eeprom_temp_address);
         RM_temperature.add(temp_measure);
 
         return RM_temperature.getMedian();

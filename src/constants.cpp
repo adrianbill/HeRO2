@@ -33,9 +33,10 @@ double He_spd;
 double He_error;
 
 //eeprom parameters for saving values across restarts
-int eeprom_size = 512;
+int eeprom_size = 800;
 int eeprom_O2_address = 0;
 int eeprom_dist_address = 256;
+int eeprom_temp_address = 520;
 
 // I2C Pins
 extern constexpr int sda_pin{8};

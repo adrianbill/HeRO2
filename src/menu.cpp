@@ -74,6 +74,11 @@ uint8_t dist_calibration_target_ten = 0;
 uint8_t dist_calibration_target_one = 0;
 uint8_t dist_calibration_target_dec = 0;
 
+// mui distance calibration inputs
+uint8_t temp_calibration_target_ten = 0;
+uint8_t temp_calibration_target_one = 0;
+uint8_t temp_calibration_target_sign = 0;
+
 // Main Menu items
 // {font, icon character 1, icon character 2, Title} second icon character used for O2 & He elements
 struct menu_entry_type menu_entry_list[ELEMENTS] = {
@@ -98,6 +103,9 @@ muif_t muif_list[] = {
         MUIF_U8G2_U8_MIN_MAX("DA", &dist_calibration_target_ten, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
         MUIF_U8G2_U8_MIN_MAX("DB", &dist_calibration_target_one, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
         MUIF_U8G2_U8_MIN_MAX("DC", &dist_calibration_target_dec, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
+        MUIF_U8G2_U8_MIN_MAX("EA", &temp_calibration_target_ten, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
+        MUIF_U8G2_U8_MIN_MAX("EB", &temp_calibration_target_one, 0, 9, mui_u8g2_u8_min_max_wm_mse_pi),
+        MUIF_VARIABLE("RB",&temp_calibration_target_sign,mui_u8g2_u8_radio_wm_pi),
 
         MUIF_BUTTON("BO", mui_u8g2_btn_goto_wm_fi),
         MUIF_BUTTON("BH", mui_u8g2_btn_goto_wm_fi),
@@ -109,8 +117,9 @@ fds_t fds_data[] =
 
         MUI_FORM(3)
         MUI_STYLE(0)
-        MUI_XYAT("BO", 32, 34, 1, " O₂ ")
-        MUI_XYAT("BH", 96, 34, 2, " He ")
+        MUI_XYAT("BO", 16, 34, 1, " O₂ ")
+        MUI_XYAT("BH", 64, 34, 2, " He ")
+        MUI_XYAT("BH", 112, 34, 6, " Temp ")
         MUI_STYLE(1)
         MUI_XYAT("EX", 64, 58, 3, " exit ")
 
@@ -156,7 +165,19 @@ fds_t fds_data[] =
         MUI_XYAT("EX", 32, 34, 5, " Meas ")
         MUI_XYAT("BH", 96, 34, 4, " Input ")
         MUI_STYLE(1)
-        MUI_XYAT("EX", 64, 58, 3, " exit ");
+        MUI_XYAT("EX", 64, 58, 3, " exit ")
+        
+        MUI_FORM(6)
+        MUI_STYLE(0)
+        MUI_LABEL(0, 34, "Temp ")
+        MUI_XY("EA", 65, 34)
+        MUI_XY("EB", 75, 34)
+        MUI_LABEL(85, 34, " °C")
+        MUI_XYAT("RB", 1, 44, 1, "Neg")
+        MUI_XYAT("RB", 65, 44, 0, "Pos")
+        MUI_STYLE(1)
+        MUI_XYAT("EX", 32, 58, 6, " calibrate ")
+        MUI_XYAT("BA", 104, 58, 3, " back ");
 
 int menu_initialise(void)
 {
@@ -884,6 +905,14 @@ void submenu_cases(void)
                 break;
         case 5:
                 submenu_selected = 40;
+                calib_page_exit_code = 0;
+                button_event = 0;
+                break;
+        case 6:
+                if (temp_calibration_target_sign == 0) EEPROM.writeDouble(eeprom_temp_address, temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0);
+                if (temp_calibration_target_sign == 1) EEPROM.writeDouble(eeprom_temp_address, -1.0 * (temp_calibration_target_ten * 10.0 + temp_calibration_target_one * 1.0));
+                EEPROM.commit();
+                submenu_selected = 0;               
                 calib_page_exit_code = 0;
                 button_event = 0;
                 break;

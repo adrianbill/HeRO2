@@ -36,6 +36,7 @@ extern double He_error;
 extern int eeprom_size;
 extern int eeprom_O2_address;
 extern int eeprom_dist_address;
+extern int eeprom_temp_address;
 
 // I2C Pins
 extern const int sda_pin;
