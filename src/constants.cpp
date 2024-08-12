@@ -1,7 +1,7 @@
 // Paired Header
 #include "constants.h"
 
-extern constexpr double code_version{0.91};
+extern constexpr double code_version{0.921};
 
 // Universal Gas constant, J/(mol.K)
 extern constexpr double R_gas_constant{8.314462618};
@@ -51,3 +51,8 @@ extern constexpr int echoPin0{10}; // Echo pin for first ultrasonic sensors
 extern constexpr int next_pin{1};
 extern constexpr int select_pin{4};
 extern constexpr int prev_pin{6};
+
+//time checks
+unsigned long previousMillis = 0;
+unsigned long currentMillis;
+unsigned long deltaMillis;

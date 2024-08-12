@@ -15,9 +15,9 @@
 BME280I2C bme;
 
 // Running Average Setup
-RunningMedian RM_temperature(99);
-RunningMedian RM_humidity(99);
-RunningMedian RM_pressure(99);
+RunningMedian RM_temperature(11);
+RunningMedian RM_humidity(11);
+RunningMedian RM_pressure(11);
 
 // Initialize HTU21D sensor and clear running averages
 int Environment_Initialise(void)
@@ -62,13 +62,14 @@ double atmpressure_measurement(void)
         return RM_pressure.getMedian();
 }
 
-// Function to calculate the fraction of water in gas using relative humidity using Tetens equation
+// Function to calculate the fraction of water in gas using relative humidity using the Buck equation
 double water_measurement(void)
 {
         double temperature_C = temperature_measurement() - 273.15;
         double humidity = humidity_measurement();
         double pressure_total_kPa = atmpressure_measurement();
-        double pressure_saturation_kPa = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3));
+        // double pressure_saturation_kPa = 0.61078 * exp((17.27 * temperature_C) / (temperature_C + 237.3)); // Tetens Equation 
+        double pressure_saturation_kPa = 0.61121 * exp((18.678 - temperature_C / 234.5) * (temperature_C / (257.14 + temperature_C))); // Buck Equation
 
         return (pressure_saturation_kPa * humidity) / pressure_total_kPa; // calculate x_H20
 }

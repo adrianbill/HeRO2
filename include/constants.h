@@ -52,4 +52,9 @@ extern const int next_pin;
 extern const int select_pin;
 extern const int prev_pin;
 
+//time checks
+extern unsigned long previousMillis;
+extern unsigned long currentMillis;
+extern unsigned long deltaMillis;
+
 #endif

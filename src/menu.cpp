@@ -349,10 +349,16 @@ void run_submenu(void)
         switch (submenu_selected) {
         // Oxygen
         case 1:
+                check_button_event();
                 O2_fraction = oxygen_measurement();
+                check_button_event();
                 H2O_fraction = water_measurement(); 
+                check_button_event();
                 O2_mV = oxygen_millivolts();
+                check_button_event();
                 temperature_K = temperature_measurement();
+                check_button_event();
+                local_pressure_kPa = atmpressure_measurement();
                 He_fraction = 0;
 
                 check_button_event();
@@ -364,10 +370,16 @@ void run_submenu(void)
                 u8g2.print(H2O_fraction * 100, 2);
                 u8g2.print(" %");
 
-                u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("Cell 00.00 mV")) / 2, u8g2.getDisplayHeight() - 4);
+                // u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("Cell 0.00 mV | pO₂ 00.0 kPa")) / 2, u8g2.getDisplayHeight() - 4);
+                if (O2_mV < 10) u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("Cell 0.0 mV | pO₂ 00.0 kPa")) / 2, u8g2.getDisplayHeight() - 4);
+                else u8g2.setCursor((u8g2.getDisplayWidth() - u8g2.getStrWidth("Cell 00.0 mV | pO₂ 00.0 kPa")) / 2, u8g2.getDisplayHeight() - 4);
+
                 u8g2.print("Cell ");
                 u8g2.print(O2_mV, 1);
                 u8g2.print(" mV");
+                u8g2.print(" | pO₂ ");
+                u8g2.print(O2_fraction * local_pressure_kPa, 1);
+                u8g2.print(" kPa");
 
                 u8g2.setFont(u8g2_font_helvR24_te);
 
@@ -445,7 +457,7 @@ void run_submenu(void)
                 speed_of_sound_m_s = speed_measurement();
                 O2_fraction = oxygen_measurement();
                 H2O_fraction = water_measurement();
-                
+                local_pressure_kPa = atmpressure_measurement();
                 // calculate helium fraction
                 He_fraction = helium_measurement(He_fraction_last, O2_fraction, H2O_fraction, speed_of_sound_m_s, temperature_K);
 
@@ -475,21 +487,29 @@ void run_submenu(void)
                 if (O2_fraction < 0.10) u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   ") + u8g2.getStrWidth("0"), y_gap * 1 + y_start);
                 else u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   "), y_gap * 1 + y_start);
                 u8g2.print(O2_fraction * 100, 2);
-                u8g2.print(" % ± ");
-                u8g2.print(oxygen_stddev() * 100, 2);
+                // u8g2.print(" %");
+                u8g2.print(" %  pO₂ ");
+                u8g2.print(O2_fraction * local_pressure_kPa, 2);
+
+                // u8g2.print(" % ± ");
+                // u8g2.print(oxygen_stddev() * 100, 2);
 
                 u8g2.setCursor(x_gap, y_gap * 2 + y_start);
                 u8g2.print("He");
                 if (He_fraction < 0.10) u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   ") + u8g2.getStrWidth("0"), y_gap * 2 + y_start);
                 else u8g2.setCursor(x_gap + u8g2.getUTF8Width("Spd   "), y_gap * 2 + y_start);
                 u8g2.print(He_fraction * 100, 2);
-                u8g2.print(" % ± ");
-                u8g2.print(helium_stddev() * 100, 2);
+                u8g2.print(" %");
+                // u8g2.print(helium_stddev() * 100, 2);
+
+                u8g2.print("  |  ");
+                u8g2.print(deltaMillis);
+                u8g2.print(" ms");
                 
                 u8g2.setCursor(x_gap, y_gap * 3 + y_start);
                 u8g2.print("Spd   ");
                 u8g2.print(He_spd, 2);
-                u8g2.print(" m/s ± ");
+                u8g2.print(" m/s | ");
                 u8g2.print(He_error, 2);
 
                 temperature_K_last = temperature_K;
@@ -501,13 +521,13 @@ void run_submenu(void)
         // Calibrate
         case 3:
                 u8g2.setFont(u8g2_font_helvR10_te);
-                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("00.00 %/V");
+                x_gap = u8g2.getDisplayWidth() - u8g2.getStrWidth("0.00 kPa/mV");
 
                 u8g2.setCursor(0, 31);
                 u8g2.print("O₂");
                 u8g2.setCursor(x_gap, 31);              
-                u8g2.print(O2_calibration * 1000, 2);
-                u8g2.print(" %/V");
+                u8g2.print(O2_calibration, 2);
+                u8g2.print(" kPa/mV");
 
                 u8g2.setCursor(0, 47);
                 u8g2.print("Dist");
@@ -731,7 +751,7 @@ void run_submenu(void)
 
                 u8g2.setCursor(0, y_gap * 2 + y_start + 3);
                 u8g2.print("Version  ");
-                u8g2.print(code_version, 2);
+                u8g2.print(code_version, 3);
 
                 u8g2.setCursor(0, y_gap * 3 + y_start + 3);
                 u8g2.print("by Adrian Bill");
@@ -835,7 +855,7 @@ void splash_screen(void)
 
         u8g2.setCursor(0, u8g2.getDisplayHeight() - 2);
         u8g2.print("Ver. ");
-        u8g2.print(code_version, 2);
+        u8g2.print(code_version, 3);
 
         u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("by a. bill"), u8g2.getDisplayHeight() - 2);
         u8g2.print("by a. bill");
