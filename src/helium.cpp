@@ -16,7 +16,7 @@
 
 // Running Average Setup
 RunningMedian RM_dur(11);
-RunningAverage RM_He(50);
+RunningAverage RM_He(25);
 RunningMedian RM_dist_calibration(51);
 
 // unsigned long previousMillis = 0;
@@ -72,17 +72,14 @@ double measure_duration(void)
 {
         RM_dur.clear();
 
-        currentMillis = millis();
-        deltaMillis = currentMillis - previousMillis;
-
-        while (!RM_dur.isFull()) {
+        // while (!RM_dur.isFull()) {
 
                 check_button_event();
 
-                // unsigned long currentMillis = millis();
+                currentMillis = millis();
+                deltaMillis = currentMillis - previousMillis;
 
-
-                // if (deltaMillis > 10) {
+                if (deltaMillis > 100) {
                         // Clear the trigger pin
                         digitalWrite(trigPin, LOW);
                         delayMicroseconds(2);
@@ -95,9 +92,11 @@ double measure_duration(void)
                         double duration0 = pulseIn(echoPin0, HIGH);
                         RM_dur.add(duration0);
                         
-                // }
-        }
-        previousMillis = currentMillis;
+                }
+                
+                previousMillis = currentMillis;
+        // }
+
                 
         return RM_dur.getMedian() / 1000000.0;
 }
@@ -144,15 +143,17 @@ void calibrate_distance(double He_fraction)
 //  New function to trigger helium reading under development
 double helium_measurement(double He_fraction, double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature)
 {
-        double gain = 0.02;
-        double threshold = 0.25;
-        double error = 0.0;
-        double speed_of_sound_calculated;
-             
-        double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
-        double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
+        // currentMillis = millis();
+        // deltaMillis = currentMillis - previousMillis;
+        double gain = 0.002;
+        double threshold = 0.5;
+        double error = 0;
+        double speed_of_sound_calculated;        
 
-        do {
+        double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
+        double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+
+        do {                       
                 check_button_event();
 
                 speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
@@ -160,23 +161,34 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
                 error = speed_of_sound_measured - speed_of_sound_calculated;
 
                 He_fraction = gain * error + He_fraction;
+                
+                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+
+                // He_fraction = He_fraction + 0.0001;
+                deltaMillis = He_fraction * 100;
 
                 if (He_fraction > He_fraction_max) {
                         He_fraction = He_fraction_max;
-                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
                         break;
-                } else if (He_fraction < 0) {
+                } 
+                if (He_fraction < 0) {
                         He_fraction = 0.0;
-                        N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
                         break;
                 }
+                check_button_event();
 
         } while (abs(error) > threshold);
 
         RM_He.add(He_fraction);
 
+        check_button_event();
+
         He_spd = speed_of_sound_calculated;
         He_error = error;
+        
+
+
+        // previousMillis = currentMillis;
 
         return RM_He.getAverage();
 }

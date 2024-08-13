@@ -8,7 +8,7 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 double measure_duration(void);
 void calibrate_distance(double He_fraction);
 double speed_measurement(void);
-double helium_measurement(double He_fraction, double O2_fraction, double H2O_fraction, double speed_of_sound_measured, double temperature);
+double helium_measurement(double He_fraction, double O2_fraction_, double H2O_fraction_, double speed_of_sound_measured_, double temperature_k);
 double helium_stddev(void);
 
 #endif

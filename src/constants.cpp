@@ -55,4 +55,4 @@ extern constexpr int prev_pin{6};
 //time checks
 unsigned long previousMillis = 0;
 unsigned long currentMillis;
-unsigned long deltaMillis;
+double deltaMillis;

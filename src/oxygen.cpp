@@ -21,7 +21,7 @@ ADS1115 ads(0x48);
 
 // O2 running average setup
 RunningMedian RM_O2_mv(11);
-RunningAverage RM_O2_fraction(19);
+RunningAverage RM_O2_fraction(25);
 RunningAverage RM_mv_calibration(500);
 
 // Initialises Analog to Digital Converter for O2 Sensor and clear running average

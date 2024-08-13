@@ -458,6 +458,7 @@ void run_submenu(void)
                 O2_fraction = oxygen_measurement();
                 H2O_fraction = water_measurement();
                 local_pressure_kPa = atmpressure_measurement();
+
                 // calculate helium fraction
                 He_fraction = helium_measurement(He_fraction_last, O2_fraction, H2O_fraction, speed_of_sound_m_s, temperature_K);
 
@@ -504,13 +505,16 @@ void run_submenu(void)
 
                 u8g2.print("  |  ");
                 u8g2.print(deltaMillis);
-                u8g2.print(" ms");
+                u8g2.print(" %He");
                 
                 u8g2.setCursor(x_gap, y_gap * 3 + y_start);
-                u8g2.print("Spd   ");
-                u8g2.print(He_spd, 2);
-                u8g2.print(" m/s | ");
-                u8g2.print(He_error, 2);
+                u8g2.print("C  ");
+                u8g2.print(He_spd, 1);
+                u8g2.print(" | M ");
+                u8g2.print(speed_of_sound_m_s, 1);
+                u8g2.print(" m/s");
+
+
 
                 temperature_K_last = temperature_K;
                 O2_fraction_last = O2_fraction;
