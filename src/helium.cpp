@@ -15,8 +15,9 @@
 #include "helium.h"
 
 // Running Average Setup
-RunningMedian RM_dur(11);
-RunningAverage RM_He(25);
+RunningMedian RM_dur(3);
+RunningMedian RM_speed(3);
+RunningMedian RM_He(99);
 RunningMedian RM_dist_calibration(51);
 
 // unsigned long previousMillis = 0;
@@ -31,6 +32,7 @@ int He_Initialise(void)
         
         RM_dur.clear();
         RM_He.clear();
+        RM_speed.clear();
 
         // if (!measure_duration()) {
         //         Serial.println("Failed to measure speed.");
@@ -70,7 +72,7 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
-        RM_dur.clear();
+        // RM_dur.clear();
 
         // while (!RM_dur.isFull()) {
 
@@ -79,7 +81,7 @@ double measure_duration(void)
                 currentMillis = millis();
                 deltaMillis = currentMillis - previousMillis;
 
-                if (deltaMillis > 100) {
+                // if (deltaMillis > 500) {
                         // Clear the trigger pin
                         digitalWrite(trigPin, LOW);
                         delayMicroseconds(2);
@@ -92,7 +94,7 @@ double measure_duration(void)
                         double duration0 = pulseIn(echoPin0, HIGH);
                         RM_dur.add(duration0);
                         
-                }
+                // }
                 
                 previousMillis = currentMillis;
         // }
@@ -104,8 +106,9 @@ double measure_duration(void)
 // speed of sound measurement
 double speed_measurement(void)
 {
-        double duration = measure_duration();
-        return EEPROM.readDouble(eeprom_dist_address) / duration; // Calculate the speeds in m/s
+        RM_speed.add(EEPROM.readDouble(eeprom_dist_address) / measure_duration());
+
+        return RM_speed.getMedian(); // Calculate the speeds in m/s
 }
 
 // Function to calibrate distance, returns distance in m
@@ -145,55 +148,83 @@ double helium_measurement(double He_fraction, double O2_fraction, double H2O_fra
 {
         // currentMillis = millis();
         // deltaMillis = currentMillis - previousMillis;
-        double gain = 0.002;
-        double threshold = 0.5;
-        double error = 0;
-        double speed_of_sound_calculated;        
+        double gain = 0.005;
+        double threshold = 0.09;
+        // double error = 0;
+        // double speed_of_sound_calculated;        
 
         double He_fraction_max = 1.0 - O2_fraction - H2O_fraction;
         double N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
 
-        do {                       
-                check_button_event();
+        int reps = 0;
 
-                speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
+        double speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
 
-                error = speed_of_sound_measured - speed_of_sound_calculated;
+        double error = speed_of_sound_measured - speed_of_sound_calculated;
 
-                He_fraction = gain * error + He_fraction;
+        He_fraction = gain * error / abs(error) + He_fraction;
+
+        deltaMillis = He_fraction * 100;
+
+        if (He_fraction < 0) {
+                He_fraction = 0.0;
+                RM_He.add(He_fraction);
+        } else if (He_fraction > He_fraction_max) {
+                He_fraction = He_fraction_max;
+                RM_He.add(He_fraction);
+        } else if (abs(error) > threshold) RM_He.add(He_fraction);
+        
+
+
+
+
+
+
+        // do {                       
+        //         reps = reps + 1;
+
+        //         check_button_event();
+
+        //         speed_of_sound_calculated = calculate_speed_of_sound(He_fraction, O2_fraction, N2_fraction, H2O_fraction, temperature);
+
+        //         error = speed_of_sound_measured - speed_of_sound_calculated;
+
+        //         He_fraction = gain * error + He_fraction;
                 
-                N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
+        //         N2_fraction = 1.0 - O2_fraction - H2O_fraction - He_fraction;
 
-                // He_fraction = He_fraction + 0.0001;
-                deltaMillis = He_fraction * 100;
+        //         // He_fraction = He_fraction + 0.0001;
+        //         // deltaMillis = He_fraction * 100;
+        //         deltaMillis = reps * 1.0 ;
 
-                if (He_fraction > He_fraction_max) {
-                        He_fraction = He_fraction_max;
-                        break;
-                } 
-                if (He_fraction < 0) {
-                        He_fraction = 0.0;
-                        break;
-                }
-                check_button_event();
+        //         if (He_fraction > He_fraction_max) {
+        //                 He_fraction = He_fraction_max;
+        //                 break;
+        //         } 
+        //         if (He_fraction < 0) {
+        //                 He_fraction = 0.0;
+        //                 break;
+        //         }
+        //         check_button_event();
 
-        } while (abs(error) > threshold);
+        // } while (abs(error) > threshold);
 
-        RM_He.add(He_fraction);
+        // RM_He.add(He_fraction);
 
         check_button_event();
 
         He_spd = speed_of_sound_calculated;
         He_error = error;
-        
+     
 
 
         // previousMillis = currentMillis;
 
-        return RM_He.getAverage();
+        return RM_He.getMedianAverage(75);
 }
 
 double helium_stddev(void)
 {
-        return RM_He.getStandardDeviation();
+        return 0.0;
+        // return RM_He.getStandardDeviation();
 }

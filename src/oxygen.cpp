@@ -21,8 +21,8 @@ ADS1115 ads(0x48);
 
 // O2 running average setup
 RunningMedian RM_O2_mv(11);
-RunningAverage RM_O2_fraction(25);
-RunningAverage RM_mv_calibration(500);
+RunningMedian RM_O2_fraction(99);
+RunningMedian RM_mv_calibration(200);
 
 // Initialises Analog to Digital Converter for O2 Sensor and clear running average
 int O2_Initialise(void)
@@ -66,7 +66,7 @@ void calibrate_oxygen(void)
                 RM_mv_calibration.add(ads.readADC_Differential_0_1());
         }
 
-        double voltage_meas_mV = ads.toVoltage(RM_mv_calibration.getAverage()) * 1000.0;
+        double voltage_meas_mV = ads.toVoltage(RM_mv_calibration.getMedianAverage(50)) * 1000.0;
 
         double p_local_kPa = atmpressure_measurement();
 
@@ -94,7 +94,7 @@ double oxygen_measurement(void)
         
         RM_O2_fraction.add(oxygen_millivolts() * O2_calibration / p_local_kPa);    
 
-        return RM_O2_fraction.getAverage();
+        return RM_O2_fraction.getMedianAverage(10);
 }
 
 double oxygen_stddev(void)
