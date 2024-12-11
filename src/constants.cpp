@@ -1,7 +1,7 @@
 // Paired Header
 #include "constants.h"
 
-extern constexpr double code_version{0.921};
+extern constexpr double code_version{0.93};
 
 // Universal Gas constant, J/(mol.K)
 extern constexpr double R_gas_constant{8.314462618};
@@ -39,8 +39,8 @@ int eeprom_dist_address = 256;
 int eeprom_temp_address = 520;
 
 // I2C Pins
-extern constexpr int sda_pin{8};
-extern constexpr int scl_pin{9};
+extern constexpr int sda_pin{9};
+extern constexpr int scl_pin{8};
 
 // Ultrasonic Sensor Setup
 extern constexpr int trigPin{11}; // Single Trigger pin for both ultrasonic sensors
@@ -48,11 +48,14 @@ extern constexpr int echoPin0{10}; // Echo pin for first ultrasonic sensors
 // extern constexpr int echoPin1{16}; // Echo pin for second ultrasonic sensors (not used in current version)
 
 // Navigation Button pin configuration
-extern constexpr int next_pin{1};
-extern constexpr int select_pin{4};
-extern constexpr int prev_pin{6};
+extern constexpr int next_pin{5};
+extern constexpr int select_pin{6};
+extern constexpr int prev_pin{7};
 
 //time checks
 unsigned long previousMillis = 0;
 unsigned long currentMillis;
 double deltaMillis;
+
+//He Toggle
+extern constexpr int toggle_He{1};

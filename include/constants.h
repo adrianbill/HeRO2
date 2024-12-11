@@ -57,4 +57,7 @@ extern unsigned long previousMillis;
 extern unsigned long currentMillis;
 extern double deltaMillis;
 
+//He Toggle
+extern const int toggle_He;
+
 #endif

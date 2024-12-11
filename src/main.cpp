@@ -36,27 +36,37 @@ void setup(void)
         // buttons and display Initialise
         if (menu_initialise()) {
                 Serial.println("Display Connected");
-                splash_screen();
-                delay(500);
+                splash_screen(0);
         }
 
-        // Temperature, Relative Humidity, and pressure Sensor Initialise
-        if (!Environment_Initialise()) {
-                Serial.println("Environment not connected");
-                delay(500);
+        splash_screen(1);        
+        delay(1000);
+
+        //Temperature, Relative Humidity, and pressure Sensor Initialise
+        if (Environment_Initialise()) {
+                Serial.println("Environment connected");
         }
+
+        splash_screen(2);
+        delay(1000);
+        splash_screen(3);
 
         // Oxygen sensor Initialise
         if (O2_Initialise()) {
                 Serial.println("ADC Connected");
-                delay(500);
         }
 
-        // Oxygen sensor Initialise
+        splash_screen(4);
+        delay(1000);
+        splash_screen(5);
+
+        // He sensor Initialise
         if (He_Initialise()) {
                 Serial.println("Ultrasonic Connected");
-                delay(500);
         }
+                
+        splash_screen(6);
+        delay(1000);
 
         load_calibration_values();
 

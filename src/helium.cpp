@@ -72,6 +72,8 @@ double calculate_speed_of_sound(double He_fraction, double O2_fraction, double N
 // Function to measure the sound travel time in seconds one way
 double measure_duration(void)
 {
+        if (toggle_He) return 1;
+
         // RM_dur.clear();
 
         // while (!RM_dur.isFull()) {
@@ -98,7 +100,6 @@ double measure_duration(void)
                 
                 previousMillis = currentMillis;
         // }
-
                 
         return RM_dur.getMedian() / 1000000.0;
 }

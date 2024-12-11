@@ -21,7 +21,9 @@
 #include "menu.h"       // menu parameters and definitions, used to clean up top of this file
 
 //setup display and mui menus
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
+//U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
+
 MUIU8G2 mui;
 
 // Menu element struct definition
@@ -399,6 +401,13 @@ void run_submenu(void)
                 break;
         // Trimix
         case 2:
+                if (toggle_He) {
+                        u8g2.setFont(u8g2_font_helvR12_te);
+                        u8g2.setCursor(4, 38);
+                        u8g2.print("He Not Available");
+                        break;
+                }
+
                 u8g2.clearBuffer();
                 u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
 
@@ -450,6 +459,12 @@ void run_submenu(void)
 
                 break;
         case 20:
+
+                if (toggle_He) {
+                        submenu_selected = 0;
+                        break;
+                }
+
                 u8g2.clearBuffer();
                 u8g2.drawHLine(0, y_start + 5, u8g2.getDisplayWidth());
 
@@ -840,7 +855,7 @@ void dist_calibrate_run_display(void)
         delay(1500);
 }
 
-void splash_screen(void)
+void splash_screen(int splash_event)
 {
         int y_start = 33;
 
@@ -861,8 +876,36 @@ void splash_screen(void)
         u8g2.print("Ver. ");
         u8g2.print(code_version, 3);
 
-        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("by a. bill"), u8g2.getDisplayHeight() - 2);
-        u8g2.print("by a. bill");
+        switch (splash_event)
+        {
+        case 1:
+                u8g2.print(" Env Chk");
+                break;
+        case 2:
+                u8g2.print(" Env Ok");
+                break;
+        case 3:
+                u8g2.print(" O2 Chk");
+                break;
+        case 4:
+                u8g2.print(" O2 Ok");
+                break;        
+        case 5:
+                u8g2.print(" He Chk");
+                break;
+        case 6:
+                if (toggle_He) {
+                        u8g2.print(" He NA");
+                        break;
+                }
+                u8g2.print(" He Ok");
+                break; 
+        default:
+                break;
+        }
+
+        u8g2.setCursor(u8g2.getDisplayWidth() - u8g2.getStrWidth("a. bill"), u8g2.getDisplayHeight() - 2);
+        u8g2.print("a. bill");
         
         u8g2.sendBuffer();
 }
