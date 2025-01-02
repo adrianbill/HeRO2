@@ -25,4 +25,6 @@ Gas analyser for mixed gas divering.
 - [Design & Layout](./Design.md)
 
 ## Circuit
+This circuit is now outdated, a new diagram is forthcoming. 
+major change is reducing the the number of ultrasonic modules to one.
 <img src="./diagrams/Circuit%20Diagram.png" alt="Circuit Diagram" width="500"/>
