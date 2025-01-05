@@ -39,8 +39,12 @@ int eeprom_dist_address = 256;
 int eeprom_temp_address = 520;
 
 // I2C Pins
-extern constexpr int sda_pin{9};
-extern constexpr int scl_pin{8};
+// O2 Proto for John
+// extern constexpr int sda_pin{9};
+// extern constexpr int scl_pin{8};
+// He Prototype
+extern constexpr int sda_pin{8};
+extern constexpr int scl_pin{9};
 
 // Ultrasonic Sensor Setup
 extern constexpr int trigPin{11}; // Single Trigger pin for both ultrasonic sensors
@@ -48,14 +52,19 @@ extern constexpr int echoPin0{10}; // Echo pin for first ultrasonic sensors
 // extern constexpr int echoPin1{16}; // Echo pin for second ultrasonic sensors (not used in current version)
 
 // Navigation Button pin configuration
-extern constexpr int next_pin{5};
-extern constexpr int select_pin{6};
-extern constexpr int prev_pin{7};
+// O2 Proto for John
+// extern constexpr int next_pin{5};
+// extern constexpr int select_pin{6};
+// extern constexpr int prev_pin{7};
+// He Prototype
+extern constexpr int next_pin{1};
+extern constexpr int select_pin{4};
+extern constexpr int prev_pin{6};
 
 //time checks
-unsigned long previousMillis = 0;
+unsigned long previousMillis;
 unsigned long currentMillis;
 double deltaMillis;
 
 //He Toggle
-extern constexpr int toggle_He{1};
+extern constexpr int toggle_He{0};

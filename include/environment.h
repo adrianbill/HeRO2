@@ -3,6 +3,7 @@
 
 int Environment_Initialise(void);
 double temperature_measurement(void);
+double temperature_measurement_raw(void);
 double humidity_measurement(void);
 double atmpressure_measurement(void);
 double water_measurement(void);

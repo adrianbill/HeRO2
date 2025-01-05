@@ -7,6 +7,7 @@
 #include <BME280I2C.h>      // Temp/Hum/Pres sensor Library
 #include <ADS1X15.h>        // ADC / Amplifier Library
 #include <RunningAverage.h> // Running Average Library
+#include <NewPing.h>        // US Sensor Library    
 #include "EEPROM.h"
 
 // Custom Headers

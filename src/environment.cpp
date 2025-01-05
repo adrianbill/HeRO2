@@ -41,16 +41,23 @@ double temperature_measurement(void)
         double temp_measure = bme.temp() + 273.15 + EEPROM.readDouble(eeprom_temp_address);
         RM_temperature.add(temp_measure);
 
-        return RM_temperature.getMedian();
+        return RM_temperature.getMedianAverage(5);
+}
+
+// Temperature Measurement Function in Kelvin
+double temperature_measurement_raw(void)
+{
+        return bme.temp() * 1.0;
 }
 
 // Relative Humidity Measurement Function
 double humidity_measurement(void)
 {
         double hum_measure = bme.hum() / 100;
+
         RM_humidity.add(hum_measure);
 
-        return RM_humidity.getMedian();
+        return RM_humidity.getMedianAverage(5);
 }
 
 // Atmospheric Pressure Measurement Function in kPa
@@ -59,7 +66,7 @@ double atmpressure_measurement(void)
         double pressure_total = bme.pres() / 10; // reads pressure in hPa and converts to kPa
         RM_pressure.add(pressure_total);
 
-        return RM_pressure.getMedian();
+        return RM_pressure.getMedianAverage(5);
 }
 
 // Function to calculate the fraction of water in gas using relative humidity using the Buck equation
