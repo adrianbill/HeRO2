@@ -22,7 +22,10 @@ extern const double H2O_molar_mass;
 extern double O2_cal_target;
 extern double O2_calibration;
 extern double dist_calibration_target;
-extern double distance_calibrated;
+extern double distance_calibration;
+extern const double dist_actual;
+extern double temperature_calibration;
+void load_calibration_values(void);
 
 // Save last sensor readings
 extern double temperature_K_last;
@@ -53,9 +56,12 @@ extern const int select_pin;
 extern const int prev_pin;
 
 //time checks
-extern unsigned long previousMillis;
-extern unsigned long currentMillis;
-extern double deltaMillis;
+// extern unsigned long currentMillis;
+extern unsigned long previousMillis_dur;
+extern unsigned long deltaMillis_dur;
+extern unsigned long previousMillis_dur_raw;
+extern unsigned long deltaMillis_dur_raw;
+extern const int ping_delay;
 
 //He Toggle
 extern const int toggle_He;

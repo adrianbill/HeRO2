@@ -1,3 +1,6 @@
+// Custom Headers
+#include <EEPROM.h>
+
 // Paired Header
 #include "constants.h"
 
@@ -22,7 +25,15 @@ extern constexpr double H2O_molar_mass{0.01802};
 double O2_cal_target = 0.209;
 double O2_calibration;
 double dist_calibration_target = 0.0;
-double distance_calibrated;
+double distance_calibration;
+extern constexpr double dist_actual{553.0};
+double temperature_calibration = EEPROM.readDouble(eeprom_temp_address);
+void load_calibration_values(void)
+{      
+        O2_calibration = EEPROM.readDouble(eeprom_O2_address);
+        distance_calibration = EEPROM.readDouble(eeprom_dist_address);
+        temperature_calibration = EEPROM.readDouble(eeprom_temp_address);
+}
 
 // Save last sensor readings
 double temperature_K_last = 0;
@@ -33,10 +44,10 @@ double He_spd;
 double He_error;
 
 //eeprom parameters for saving values across restarts
-int eeprom_size = 800;
+int eeprom_size = 1024;
 int eeprom_O2_address = 0;
-int eeprom_dist_address = 256;
-int eeprom_temp_address = 520;
+int eeprom_dist_address = 512;
+int eeprom_temp_address = 768;
 
 // I2C Pins
 // O2 Proto for John
@@ -62,9 +73,13 @@ extern constexpr int select_pin{4};
 extern constexpr int prev_pin{6};
 
 //time checks
-unsigned long previousMillis;
-unsigned long currentMillis;
-double deltaMillis;
+// unsigned long currentMillis;
+unsigned long previousMillis_dur = 0;
+unsigned long deltaMillis_dur;
+unsigned long previousMillis_dur_raw = 0;
+unsigned long deltaMillis_dur_raw;
+extern constexpr int ping_delay{125};
 
 //He Toggle
 extern constexpr int toggle_He{0};
+

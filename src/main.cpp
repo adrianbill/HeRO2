@@ -8,7 +8,7 @@
 #include <ADS1X15.h>        // ADC / Amplifier Library
 #include <RunningAverage.h> // Running Average Library
 #include <NewPing.h>        // US Sensor Library    
-#include "EEPROM.h"
+#include <EEPROM.h>
 
 // Custom Headers
 #include "constants.h"   // Global Constants
@@ -20,13 +20,13 @@
 void setup(void)
 {
         // start serial connection
-        Serial.begin(115200);
-        delay(1000); // Delay to stabilize serial communication
+        // Serial.begin(115200);
+        // delay(1000); // Delay to stabilize serial communication
 
         if (!EEPROM.begin(eeprom_size)) {
-                Serial.println("Failed to initialize EEPROM");
-                Serial.println("Restarting...");
-                delay(1000);
+                // Serial.println("Failed to initialize EEPROM");
+                // Serial.println("Restarting...");
+                // delay(1000);
                 ESP.restart();
         }  
 
@@ -86,4 +86,6 @@ void loop(void)
                 submenu_draw();
         else 
                 submenu_cases();
+        
+        check_button_event();
 }
