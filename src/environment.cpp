@@ -17,9 +17,9 @@
 BME280I2C bme;
 
 // Running Average Setup
-RunningMedian RM_temperature(11);
-RunningMedian RM_humidity(11);
-RunningMedian RM_pressure(11);
+RunningMedian RM_temperature(5);
+RunningMedian RM_humidity(5);
+RunningMedian RM_pressure(5);
 
 // Initialize HTU21D sensor and clear running averages
 int Environment_Initialise(void)

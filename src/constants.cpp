@@ -51,11 +51,11 @@ int eeprom_temp_address = 768;
 
 // I2C Pins
 // O2 Proto for John
-// extern constexpr int sda_pin{9};
-// extern constexpr int scl_pin{8};
+extern constexpr int sda_pin{9};
+extern constexpr int scl_pin{8};
 // He Prototype
-extern constexpr int sda_pin{8};
-extern constexpr int scl_pin{9};
+// extern constexpr int sda_pin{8};
+// extern constexpr int scl_pin{9};
 
 // Ultrasonic Sensor Setup
 extern constexpr int trigPin{11}; // Single Trigger pin for both ultrasonic sensors
@@ -64,13 +64,13 @@ extern constexpr int echoPin0{10}; // Echo pin for first ultrasonic sensors
 
 // Navigation Button pin configuration
 // O2 Proto for John
-// extern constexpr int next_pin{5};
-// extern constexpr int select_pin{6};
-// extern constexpr int prev_pin{7};
+extern constexpr int next_pin{5};
+extern constexpr int select_pin{6};
+extern constexpr int prev_pin{7};
 // He Prototype
-extern constexpr int next_pin{1};
-extern constexpr int select_pin{4};
-extern constexpr int prev_pin{6};
+// extern constexpr int next_pin{1};
+// extern constexpr int select_pin{4};
+// extern constexpr int prev_pin{6};
 
 //time checks
 // unsigned long currentMillis;
@@ -81,5 +81,5 @@ unsigned long deltaMillis_dur_raw;
 extern constexpr int ping_delay{125};
 
 //He Toggle
-extern constexpr int toggle_He{0};
+extern constexpr int toggle_He{1};
 

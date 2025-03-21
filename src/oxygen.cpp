@@ -20,7 +20,7 @@
 ADS1115 ads(0x48);
 
 // O2 running average setup
-RunningMedian RM_O2_mv(11);
+RunningMedian RM_O2_mv(5);
 RunningMedian RM_O2_fraction(5);
 RunningMedian RM_mv_calibration(200);
 
