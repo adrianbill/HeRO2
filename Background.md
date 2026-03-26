@@ -7,7 +7,7 @@
   - Helium ($He$)
   - Oxygen ($O_2$)
   - Nitrogen ($N_2$)
-  - Water ($H_2$)
+  - Water ($H_2$O)
 - Carbon Monoxide ($CO$) levels will only be used as a safety measure.
 
 ## Water Fraction and Relative Humidity
